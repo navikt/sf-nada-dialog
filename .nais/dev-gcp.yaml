@@ -1,0 +1,62 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: sf-nada-dialog
+  namespace: team-dialog
+  labels:
+    team: team-dialog
+spec:
+  image: {{ image }}
+  port: 8080
+  replicas:
+    min: 1
+    max: 1
+  liveness:
+    path: /isAlive
+    initialDelay: 5
+    periodSeconds: 5
+    failureThreshold: 30
+  readiness:
+    path: /isReady
+    initialDelay: 5
+    periodSeconds: 5
+    failureThreshold: 30
+  prometheus:
+    enabled: true
+    path: /metrics
+  resources:
+    limits:
+      memory: 3Gi
+    requests:
+      cpu: 10m
+      memory: 1Gi
+  ingresses:
+    - "https://sf-nada-dialog.intern.dev.nav.no"
+  envFrom:
+    - secret: sf-nada-preprod
+  gcp:
+    bigQueryDatasets:
+      - name: aareg_avtaler
+        permission: READWRITE
+  accessPolicy:
+    outbound:
+      external:
+        - host: test.salesforce.com
+        - host: navdialog--preprod.sandbox.my.salesforce.com
+  env:
+    - name: POST_TO_BIGQUERY
+      value: 'false'
+    - name: RUN_SESSION_ON_STARTUP
+      value: 'false'
+    - name: FETCH_ALL_RECORDS
+      value: 'false'
+    - name: EXCLUDE_TABLES
+      value: ''
+    - name: MAPDEF_FILE
+      value: '/mapdef/dev.json'
+    - name: SF_TOKENHOST
+      value: 'https://test.salesforce.com'
+    - name: SF_QUERY_BASE
+      value : '/services/data/v57.0/query?q='
+    - name: DEPLOY_CLUSTER
+      value: {{ DEPLOY_CLUSTER }}

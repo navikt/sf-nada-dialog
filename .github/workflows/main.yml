@@ -1,0 +1,13 @@
+name: Configure and run workflow
+
+on: [push, pull_request]
+
+jobs:
+  build-deploy:
+    uses: ./.github/workflows/workflow.yml
+    secrets: inherit
+    permissions:
+      id-token: write
+      contents: write
+    with:
+      DEPLOY_CLUSTER: prod-gcp

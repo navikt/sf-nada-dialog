@@ -1,0 +1,61 @@
+{
+  "aareg_avtaler": {
+    "aareg_avtaler_for_tilgang": {
+      "query": "SELECT name, OrganizationNumber__c, AccountName__c, APIAccess__c, ExtractionAccess__c, OnlineAccess__c, CreatedDate, Status__c, DataProcessorName__c, DataProcessorOrganizationNumber__c, AccountCategory__c, ApplicationBasisFields__c, EventAccess__c FROM Agreement__c",
+      "schema": {
+        "Name": {
+          "name": "avtalenummer",
+          "type": "STRING"
+        },
+        "OrganizationNumber__c": {
+          "name": "organisasjonsnummer",
+          "type": "STRING"
+        },
+        "AccountName__c": {
+          "name": "virksomhet",
+          "type": "STRING"
+        },
+        "APIAccess__c": {
+          "name": "integrert_oppslag_api",
+          "type": "BOOL"
+        },
+        "ExtractionAccess__c": {
+          "name": "uttrekk",
+          "type": "BOOL"
+        },
+        "OnlineAccess__c": {
+          "name": "web_oppslag",
+          "type": "BOOL"
+        },
+        "CreatedDate": {
+          "name": "opprettet",
+          "type": "DATETIME"
+        },
+        "Status__c": {
+          "name": "status",
+          "type": "STRING"
+        },
+        "DataProcessorName__c": {
+          "name": "databehandler_navn",
+          "type": "STRING"
+        },
+        "DataProcessorOrganizationNumber__c": {
+          "name": "databehandler_organisasjonsnummer",
+          "type": "STRING"
+        },
+        "accountCategory__c": {
+          "name": "virksomhetskategori",
+          "type": "STRING"
+        },
+        "ApplicationBasisFields__c": {
+          "name": "hjemmel_behandlingsgrunnlag_formal",
+          "type": "STRING"
+        },
+        "EventAccess__c": {
+          "name": "hendelser",
+          "type": "BOOL"
+        }
+      }
+    }
+  }
+}
