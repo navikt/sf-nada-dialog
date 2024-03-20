@@ -36,7 +36,7 @@ spec:
     - secret: sf-nada-prod
   gcp:
      bigQueryDatasets:
-      - name: aareg_avtaler
+      - name: arbeidsgiver_aktiviteter
         permission: READWRITE
   accessPolicy:
     outbound:
