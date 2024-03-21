@@ -1,59 +1,27 @@
 {
-  "aareg_avtaler": {
-    "aareg_avtaler_for_tilgang": {
-      "query": "SELECT name, OrganizationNumber__c, AccountName__c, APIAccess__c, ExtractionAccess__c, OnlineAccess__c, CreatedDate, Status__c, DataProcessorName__c, DataProcessorOrganizationNumber__c, AccountCategory__c, ApplicationBasisFields__c, EventAccess__c FROM Agreement__c",
+  "arbeidsgiver_aktiviteter": {
+    "oppgaver": {
+      "query": "SELECT Id, WhatId, AccountId, WhoId, Subject, ActivityDate, TAG_AccountNAVUnit__c, TAG_AccountOrgType__c, TAG_UserNAVUnit__c, TAG_AccountParentId__c, TAG_AccountParentOrgNumber__c, Status, Priority, Type, CreatedDate, LastModifiedDate, IsClosed, CompletedDateTime, TAG_ActivityType__c, TAG_service__c, CRM_Region__c, CRM_Unit__c, CRM_AccountOrgNumber__c, ReminderDateTime WHERE AccountId != null AND TAG_AccountOrgType__c != null",
       "schema": {
-        "Name": {
-          "name": "avtalenummer",
+        "Id": {
+          "name": "id",
           "type": "STRING"
         },
-        "OrganizationNumber__c": {
-          "name": "organisasjonsnummer",
+        "TAG_ActivityType__c": {
+          "name": "tema",
           "type": "STRING"
         },
-        "AccountName__c": {
-          "name": "virksomhet",
+        "TAG_service__c": {
+          "name": "tjeneste",
           "type": "STRING"
         },
-        "APIAccess__c": {
-          "name": "integrert_oppslag_api",
-          "type": "BOOL"
-        },
-        "ExtractionAccess__c": {
-          "name": "uttrekk",
-          "type": "BOOL"
-        },
-        "OnlineAccess__c": {
-          "name": "web_oppslag",
-          "type": "BOOL"
+        "Subject": {
+          "name": "emne",
+          "type": "STRING"
         },
         "CreatedDate": {
-          "name": "opprettet",
+          "name": "opprettet dato",
           "type": "DATETIME"
-        },
-        "Status__c": {
-          "name": "status",
-          "type": "STRING"
-        },
-        "DataProcessorName__c": {
-          "name": "databehandler_navn",
-          "type": "STRING"
-        },
-        "DataProcessorOrganizationNumber__c": {
-          "name": "databehandler_organisasjonsnummer",
-          "type": "STRING"
-        },
-        "accountCategory__c": {
-          "name": "virksomhetskategori",
-          "type": "STRING"
-        },
-        "ApplicationBasisFields__c": {
-          "name": "hjemmel_behandlingsgrunnlag_formal",
-          "type": "STRING"
-        },
-        "EventAccess__c": {
-          "name": "hendelser",
-          "type": "BOOL"
         }
       }
     }
