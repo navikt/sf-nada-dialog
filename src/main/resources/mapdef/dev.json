@@ -1,7 +1,7 @@
 {
   "arbeidsgiver_aktiviteter": {
-    "Oppgaver": {
-      "query": "SELECT Id, TAG_ActivityType__c, TAG_service__c, Subject, CreatedDate, LastModifiedDate FROM Task WHERE AccountId != null AND TAG_AccountOrgType2__c != null",
+    "tasks": {
+      "query": "SELECT Id, TAG_ActivityType__c, TAG_service__c, Subject FROM Task",
       "schema": {
         "Id": {
           "name": "id",
@@ -18,14 +18,6 @@
         "Subject": {
           "name": "emne",
           "type": "STRING"
-        },
-        "CreatedDate": {
-          "name": "opprettet dato",
-          "type": "DATETIME"
-        },
-        "LastModifiedDate": {
-          "name": "endret dato",
-          "type": "DATETIME"
         }
       }
     }
