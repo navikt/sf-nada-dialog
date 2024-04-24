@@ -1,7 +1,7 @@
 {
   "arbeidsgiver_aktiviteter": {
     "taskActivities": {
-      "query": "SELECT Id, TAG_ActivityType__c, TAG_service__c, Subject, CreatedDate, LastModifiedDate FROM Task",
+      "query": "SELECT Id, TAG_ActivityType__c, TAG_service__c, Subject, CreatedDate, LastModifiedDat, CRM_AccountOrgNumber__c FROM Task",
       "schema": {
         "Id": {
           "name": "id",
@@ -26,11 +26,15 @@
         "LastModifiedDate": {
           "name": "endret_dato",
           "type": "DATETIME"
+        },
+        "CRM_AccountOrgNumber__c": {
+          "name": "virksomhet_orgnr",
+          "type": "STRING"
         }
       }
     },
     "eventActivities": {
-      "query": "SELECT Id, TAG_ActivityType__c, TAG_service__c, Subject, CreatedDate, LastModifiedDate, Account.Name, Account.INT_OrganizationNumber__c, Account.CRM_AccountType__c FROM Event",
+      "query": "SELECT Id, TAG_ActivityType__c, TAG_service__c, Subject, CreatedDate, LastModifiedDate FROM Event",
       "schema": {
         "Id": {
           "name": "id",
@@ -55,18 +59,6 @@
         "LastModifiedDate": {
           "name": "endret_dato",
           "type": "DATETIME"
-        },
-        "Account.Name": {
-          "name": "virksomhet_navn",
-          "type": "STRING"
-        },
-        "Account.INT_OrganizationNumber__c": {
-          "name": "virksomhet_orgnr",
-          "type": "INTEGER"
-        },
-        "Account.CRM_AccountType__c": {
-          "name": "virksomhet_type",
-          "type": "STRING"
         }
       }
     }
