@@ -1,7 +1,7 @@
 {
   "arbeidsgiver_aktiviteter": {
     "taskActivities": {
-      "query": "SELECT Id, TAG_ActivityType__c, TAG_service__c, Subject, CreatedDate, LastModifiedDat, CRM_AccountOrgNumber__c FROM Task",
+      "query": "SELECT Id, TAG_ActivityType__c, TAG_service__c, Subject, CreatedDate, LastModifiedDate, CRM_AccountOrgNumber__c FROM Task",
       "schema": {
         "Id": {
           "name": "id",
