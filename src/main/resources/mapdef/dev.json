@@ -38,38 +38,6 @@
         "Account.CRM_AccountType__c": {
           "name": "virksomhet_type",
           "type": "STRING"
-        },
-        "Account.Id": {
-          "name": "virksomhet_id",
-          "type": "STRING"
-        },
-        "Account.TAG_Partner_Status__c": {
-          "name": "virksomhet_partner_status",
-          "type": "STRING"
-        },
-        "Account.INT_Industry__c": {
-          "name": "virksomhet_næring",
-          "type": "STRING"
-        },
-        "Account.TAG_Main_Industry__c": {
-          "name": "virksomhet_næringsgruppe",
-          "type": "STRING"
-        },
-        "Account.Shipping_State__c": {
-          "name": "virksomhet_kommune",
-          "type": "STRING"
-        },
-        "Account.INT_MunicipalityNumber__c": {
-          "name": "virksomhet_kommunenummer",
-          "type": "STRING"
-        },
-        "Account.INT_OrganizationalStructure__c": {
-          "name": "virksomhet_organisasjonsform",
-          "type": "STRING"
-        },
-        "Account.INT_Sector__c": {
-          "name": "virksomhet_sektor",
-          "type": "STRING"
         }
       }
     },
@@ -110,38 +78,6 @@
         },
         "Account.CRM_AccountType__c": {
           "name": "virksomhet_type",
-          "type": "STRING"
-        },
-        "Account.Id": {
-          "name": "virksomhet_id",
-          "type": "STRING"
-        },
-        "Account.TAG_Partner_Status__c": {
-          "name": "virksomhet_partner_status",
-          "type": "STRING"
-        },
-        "Account.INT_Industry__c": {
-          "name": "virksomhet_næring",
-          "type": "STRING"
-        },
-        "Account.TAG_Main_Industry__c": {
-          "name": "virksomhet_næringsgruppe",
-          "type": "STRING"
-        },
-        "Account.Shipping_State__c": {
-          "name": "virksomhet_kommune",
-          "type": "STRING"
-        },
-        "Account.INT_MunicipalityNumber__c": {
-          "name": "virksomhet_kommunenummer",
-          "type": "STRING"
-        },
-        "Account.INT_OrganizationalStructure__c": {
-          "name": "virksomhet_organisasjonsform",
-          "type": "STRING"
-        },
-        "Account.INT_Sector__c": {
-          "name": "virksomhet_sektor",
           "type": "STRING"
         }
       }
