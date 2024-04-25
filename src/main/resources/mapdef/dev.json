@@ -32,35 +32,6 @@
           "type": "STRING"
         }
       }
-    },
-    "eventActivities": {
-      "query": "SELECT Id, TAG_ActivityType__c, TAG_service__c, Subject, CreatedDate, LastModifiedDate FROM Event",
-      "schema": {
-        "Id": {
-          "name": "id",
-          "type": "STRING"
-        },
-        "TAG_ActivityType__c": {
-          "name": "tema",
-          "type": "STRING"
-        },
-        "TAG_service__c": {
-          "name": "tjeneste",
-          "type": "STRING"
-        },
-        "Subject": {
-          "name": "emne",
-          "type": "STRING"
-        },
-        "CreatedDate": {
-          "name": "opprettet_dato",
-          "type": "DATETIME"
-        },
-        "LastModifiedDate": {
-          "name": "endret_dato",
-          "type": "DATETIME"
-        }
-      }
     }
   }
 }
