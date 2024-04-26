@@ -1,7 +1,7 @@
 {
   "arbeidsgiver_aktivitet": {
     "Oppgave_aktivitet": {
-      "query": "SELECT Id, TAG_ActivityType__c, TAG_service__c, Subject, CreatedDate, LastModifiedDate, CRM_AccountOrgNumber__c, ActivityDate, TAG_AccountNAVUnit__c, TAG_AccountOrgType__c, TAG_UserNAVUnit__c, TAG_AccountParentId__c, TAG_AccountParentOrgNumber__c, TAG_Status__c, Priority, Type, TaskSubtype, CRM_Region__c, CRM_Unit__c, ReminderDateTime, RecordTypeId FROM Task",
+      "query": "SELECT Id, TAG_ActivityType__c, TAG_service__c, Subject, CreatedDate, LastModifiedDate, CRM_AccountOrgNumber__c, ActivityDate, TAG_AccountNAVUnit__c, TAG_AccountOrgType__c, TAG_UserNAVUnit__c, TAG_AccountParentId__c, TAG_AccountParentOrgNumber__c, TAG_Status__c, Priority, Type, TaskSubtype, CRM_Region__c, CRM_Unit__c, ReminderDateTime, RecordTypeId FROM Task WHERE CreatedDate > 2024-01-01T00:00:00Z",
       "schema": {
         "Id": {
           "name": "id",
@@ -90,7 +90,7 @@
       }
     },
     "Møte_aktivitet": {
-      "query": "SELECT Id, TAG_ActivityType__c, TAG_service__c, Subject, CreatedDate, LastModifiedDate, CRM_AccountOrgNumber__c, ActivityDate, TAG_AccountNAVUnit__c, TAG_AccountOrgType__c, TAG_UserNAVUnit__c, TAG_AccountParentId__c, TAG_AccountParentOrgNumber__c, TAG_Status__c, Type, CRM_Region__c, CRM_Unit__c, ReminderDateTime, RecordTypeId, StartDateTime, EndDateTime, EventSubtype, DurationInMinutes FROM Event",
+      "query": "SELECT Id, TAG_ActivityType__c, TAG_service__c, Subject, CreatedDate, LastModifiedDate, CRM_AccountOrgNumber__c, ActivityDate, TAG_AccountNAVUnit__c, TAG_AccountOrgType__c, TAG_UserNAVUnit__c, TAG_AccountParentId__c, TAG_AccountParentOrgNumber__c, TAG_Status__c, Type, CRM_Region__c, CRM_Unit__c, ReminderDateTime, RecordTypeId, StartDateTime, EndDateTime, EventSubtype, DurationInMinutes FROM Event CreatedDate > 2024-01-01T00:00:00Z",
       "schema": {
         "Id": {
           "name": "id",
@@ -121,7 +121,7 @@
           "type": "STRING"
         },
         "ActivityDate": {
-          "name": "Forfallsdato",
+          "name": "møte_dato",
           "type": "DATE"
         },
         "TAG_AccountNAVUnit__c": {
