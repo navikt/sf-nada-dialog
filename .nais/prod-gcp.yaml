@@ -45,9 +45,9 @@ spec:
         - host: navdialog.my.salesforce.com
   env:
     - name: POST_TO_BIGQUERY
-      value: 'true'
+      value: 'false'
     - name: RUN_SESSION_ON_STARTUP
-      value: 'true'
+      value: 'false'
     - name: FETCH_ALL_RECORDS
       value: 'true'
     - name: EXCLUDE_TABLES
