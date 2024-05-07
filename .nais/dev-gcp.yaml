@@ -36,7 +36,7 @@ spec:
     - secret: sf-nada-preprod
   gcp:
     bigQueryDatasets:
-      - name: arbeidsgiver_aktiviteter
+      - name: arbeidsgiver_aktiviteter_dev
         permission: READWRITE
   accessPolicy:
     outbound:
