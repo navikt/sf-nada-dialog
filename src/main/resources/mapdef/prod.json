@@ -32,7 +32,7 @@
           "type": "STRING"
         },
         "ActivityDate": {
-          "name": "Forfallsdato",
+          "name": "forfallsdato",
           "type": "DATE"
         },
         "TAG_AccountNAVUnit__c": {
