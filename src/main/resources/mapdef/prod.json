@@ -1,6 +1,103 @@
 {
-  "arbeidsgiver_aktivitet": {
-    "Oppgave_aktivitet": {
+  "arbeidsgiver_aktiviteter": {
+    "arbeidsgiver_moeter": {
+      "query": "SELECT Id, TAG_ActivityType__c, TAG_service__c, Subject, CreatedDate, LastModifiedDate, CRM_AccountOrgNumber__c, ActivityDate, TAG_AccountNAVUnit__c, TAG_AccountOrgType__c, TAG_UserNAVUnit__c, TAG_AccountParentId__c, TAG_AccountParentOrgNumber__c, TAG_Status__c, Type, CRM_Region__c, CRM_Unit__c, ReminderDateTime, RecordTypeId, StartDateTime, EndDateTime, EventSubtype, DurationInMinutes FROM Event",
+      "schema": {
+        "Id": {
+          "name": "id",
+          "type": "STRING"
+        },
+        "TAG_ActivityType__c": {
+          "name": "tema",
+          "type": "STRING"
+        },
+        "TAG_service__c": {
+          "name": "tjeneste",
+          "type": "STRING"
+        },
+        "Subject": {
+          "name": "emne",
+          "type": "STRING"
+        },
+        "CreatedDate": {
+          "name": "opprettet_dato",
+          "type": "DATETIME"
+        },
+        "LastModifiedDate": {
+          "name": "endret_dato",
+          "type": "DATETIME"
+        },
+        "CRM_AccountOrgNumber__c": {
+          "name": "virksomhet_orgnr",
+          "type": "STRING"
+        },
+        "ActivityDate": {
+          "name": "moete_dato",
+          "type": "DATE"
+        },
+        "TAG_AccountNAVUnit__c": {
+          "name": "virksomhet_NAV_enhet",
+          "type": "STRING"
+        },
+        "TAG_AccountOrgType__c": {
+          "name": "virksomhet_type",
+          "type": "STRING"
+        },
+        "TAG_UserNAVUnit__c": {
+          "name": "ansatt_NAV_enhet",
+          "type": "STRING"
+        },
+        "TAG_AccountParentId__c": {
+          "name": "overordnet_virksomhet_id",
+          "type": "STRING"
+        },
+        "TAG_AccountParentOrgNumber__c": {
+          "name": "overordnet_virksomhet_orgnr",
+          "type": "STRING"
+        },
+        "TAG_Status__c": {
+          "name": "status",
+          "type": "STRING"
+        },
+        "Type": {
+          "name": "kanal",
+          "type": "STRING"
+        },
+        "CRM_Region__c": {
+          "name": "region",
+          "type": "STRING"
+        },
+        "CRM_Unit__c": {
+          "name": "ansatt_NAV_enhet_navn",
+          "type": "STRING"
+        },
+        "ReminderDateTime": {
+          "name": "paaminnelse_dato",
+          "type": "DATETIME"
+        },
+        "RecordTypeId": {
+          "name": "oppgaveposttype_id",
+          "type": "STRING"
+        },
+        "StartDateTime": {
+          "name": "start_tid",
+          "type": "DATETIME"
+        },
+        "EndDateTime": {
+          "name": "slutt_tid",
+          "type": "DATETIME"
+        },
+        "EventSubtype": {
+          "name": "moeteundertype",
+          "type": "STRING"
+        },
+        "DurationInMinutes": {
+          "name": "varighet",
+          "type": "INTEGER"
+        }
+      }
+    },
+    "arbeidsgiver_oppgaver": {
       "query": "SELECT Id, TAG_ActivityType__c, TAG_service__c, Subject, CreatedDate, LastModifiedDate, CRM_AccountOrgNumber__c, ActivityDate, TAG_AccountNAVUnit__c, TAG_AccountOrgType__c, TAG_UserNAVUnit__c, TAG_AccountParentId__c, TAG_AccountParentOrgNumber__c, TAG_Status__c, Priority, Type, TaskSubtype, CRM_Region__c, CRM_Unit__c, ReminderDateTime, RecordTypeId FROM Task",
       "schema": {
         "Id": {
@@ -80,7 +177,7 @@
           "type": "STRING"
         },
         "ReminderDateTime": {
-          "name": "påminnelse_dato",
+          "name": "paaminnelse_dato",
           "type": "DATETIME"
         },
         "RecordTypeId": {
@@ -88,103 +185,6 @@
           "type": "STRING"
         }
       }
-    },
-    "Møte_aktivitet": {
-      "query": "SELECT Id, TAG_ActivityType__c, TAG_service__c, Subject, CreatedDate, LastModifiedDate, CRM_AccountOrgNumber__c, ActivityDate, TAG_AccountNAVUnit__c, TAG_AccountOrgType__c, TAG_UserNAVUnit__c, TAG_AccountParentId__c, TAG_AccountParentOrgNumber__c, TAG_Status__c, Type, CRM_Region__c, CRM_Unit__c, ReminderDateTime, RecordTypeId, StartDateTime, EndDateTime, EventSubtype, DurationInMinutes FROM Event",
-      "schema": {
-        "Id": {
-          "name": "id",
-          "type": "STRING"
-        },
-        "TAG_ActivityType__c": {
-          "name": "tema",
-          "type": "STRING"
-        },
-        "TAG_service__c": {
-          "name": "tjeneste",
-          "type": "STRING"
-        },
-        "Subject": {
-          "name": "emne",
-          "type": "STRING"
-        },
-        "CreatedDate": {
-          "name": "opprettet_dato",
-          "type": "DATETIME"
-        },
-        "LastModifiedDate": {
-          "name": "endret_dato",
-          "type": "DATETIME"
-        },
-        "CRM_AccountOrgNumber__c": {
-          "name": "virksomhet_orgnr",
-          "type": "STRING"
-        },
-        "ActivityDate": {
-          "name": "møte_dato",
-          "type": "DATE"
-        },
-        "TAG_AccountNAVUnit__c": {
-          "name": "virksomhet_NAV_enhet",
-          "type": "STRING"
-        },
-        "TAG_AccountOrgType__c": {
-          "name": "virksomhet_type",
-          "type": "STRING"
-        },
-        "TAG_UserNAVUnit__c": {
-          "name": "ansatt_NAV_enhet",
-          "type": "STRING"
-        },
-        "TAG_AccountParentId__c": {
-          "name": "overordnet_virksomhet_id",
-          "type": "STRING"
-        },
-        "TAG_AccountParentOrgNumber__c": {
-          "name": "overordnet_virksomhet_orgnr",
-          "type": "STRING"
-        },
-        "TAG_Status__c": {
-          "name": "status",
-          "type": "STRING"
-        },
-        "Type": {
-          "name": "kanal",
-          "type": "STRING"
-        },
-        "CRM_Region__c": {
-          "name": "region",
-          "type": "STRING"
-        },
-        "CRM_Unit__c": {
-          "name": "ansatt_NAV_enhet_navn",
-          "type": "STRING"
-        },
-        "ReminderDateTime": {
-          "name": "påminnelse_dato",
-          "type": "DATETIME"
-        },
-        "RecordTypeId": {
-          "name": "oppgaveposttype_id",
-          "type": "STRING"
-        },
-        "StartDateTime": {
-          "name": "start_tid",
-          "type": "DATETIME"
-        },
-        "EndDateTime": {
-          "name": "slutt_tid",
-          "type": "DATETIME"
-        },
-        "EventSubtype": {
-          "name": "møteundertype",
-          "type": "STRING"
-        },
-        "DurationInMinutes": {
-          "name": "varighet",
-          "type": "INTEGER"
-        }
-      }
-    }
+    } 
   }
 }
