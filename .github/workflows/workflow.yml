@@ -55,6 +55,9 @@ jobs:
     name: Deploy sf-nada-crm to ${{ inputs.DEPLOY_CLUSTER }}
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: nais/deploy/actions/deploy@v1
