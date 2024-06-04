@@ -50,9 +50,9 @@ spec:
     - name: POST_TO_BIGQUERY
       value: 'true'
     - name: RUN_SESSION_ON_STARTUP
-      value: 'true'
+      value: 'false'
     - name: FETCH_ALL_RECORDS
-      value: 'true'
+      value: 'false'
     - name: EXCLUDE_TABLES
       value: ''
     - name: MAPDEF_FILE
