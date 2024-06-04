@@ -38,7 +38,6 @@ spec:
     bigQueryDatasets:
       - name: arbeidsgiver_aktiviteter_dev
         permission: READWRITE
-      bigQueryDatasets:
       - name: arbeidsgiver_data_dev
         permission: READWRITE
   accessPolicy:
