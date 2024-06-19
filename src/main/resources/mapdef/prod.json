@@ -183,6 +183,14 @@
         "RecordTypeId": {
           "name": "oppgaveposttype_id",
           "type": "STRING"
+        },
+        "WhatId": {
+          "name": "relatert_til",
+          "type": "STRING"
+        },
+        "WhoId": {
+          "name": "relatert_til_hvem",
+          "type": "STRING"
         }
       }
     } 
