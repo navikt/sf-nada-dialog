@@ -52,6 +52,9 @@ object Bootstrap {
 
         enableNAISAPI {
             // One offs (remember to remove after one run):
+
+            // 2 minutes graceful start
+            Thread.sleep(120000)
             oneOff("2024-05-23")
             oneOff("2024-05-30")
             oneOff("2024-06-03")
