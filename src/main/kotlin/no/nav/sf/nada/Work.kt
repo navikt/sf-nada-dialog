@@ -117,6 +117,7 @@ fun JsonObject.toRowMap(fieldDefMap: MutableMap<String, FieldDef>): MutableMap<S
                 Type.STRING -> element.asString
                 Type.INTEGER -> element.asInt
                 Type.DATETIME -> element.asString.subSequence(0, 23)
+                Type.DATE -> element.asString
                 Type.BOOL -> element.asBoolean
             }
         }
