@@ -51,16 +51,18 @@ object Bootstrap {
         log.info { "Starting app with settings: projectId $projectId, postTobigQuery $postToBigQuery, runSessionOnStartup $runSessionOnStartup, fetchAllRecords $fetchAllRecords, excludeTables $excludeTables" }
 
         enableNAISAPI {
-            // One offs (remember to remove after one run):
+            log.info { "1 minutes graceful start - establishing connections" }
+            Thread.sleep(60000)
 
-            // 2 minutes graceful start
-            Thread.sleep(120000)
+            // One offs (remember to remove after one run):
+            /*
             oneOff("2024-05-23")
             oneOff("2024-05-30")
             oneOff("2024-06-03")
             oneOff("2024-06-07")
             oneOff("2024-06-10")
             oneOff("2024-06-13")
+             */
             //
 
             loop()
