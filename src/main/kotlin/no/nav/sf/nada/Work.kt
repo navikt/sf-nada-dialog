@@ -125,17 +125,16 @@ fun JsonObject.toRowMap(fieldDefMap: MutableMap<String, FieldDef>): MutableMap<S
     return rowMap
 }
 
-internal fun work() {
-    val yesterday = LocalDate.now().minusDays(1)
-    log.info { "Work session starting to fetch for ${if (fetchAllRecords) "ALL" else "yesterday $yesterday"} excluding $excludeTables - post to BQ: $postToBigQuery" }
+internal fun work(targetDate: LocalDate = LocalDate.now().minusDays(1)) {
+    log.info { "Work session starting to fetch for ${if (fetchAllRecords) "ALL" else "$targetDate"} excluding $excludeTables - post to BQ: $postToBigQuery" }
     try {
         Bootstrap.mapDef.keys.forEach { dataset ->
             Bootstrap.mapDef[dataset]!!.keys.filter {
                 !(excludeTables.contains(it)).also { excluding -> if (excluding) log.info { "Will skip excluded table $it" } }
             }
                 .forEach { table ->
-                    log.info { "Will attempt fetch and send for dataset $dataset, table $table, date $yesterday" }
-                    fetchAndSend(if (fetchAllRecords) null else yesterday, dataset, table)
+                    log.info { "Will attempt fetch and send for dataset $dataset, table $table, date $targetDate" }
+                    fetchAndSend(if (fetchAllRecords) null else targetDate, dataset, table)
                     hasPostedToday = true
                 }
         }
