@@ -205,7 +205,7 @@
   },
 "arbeidsgiver_data_dev": {
   "arbeidsgiver_mulighet_dev": {
-      "query": "SELECT Id, CreatedDate, LastModifiedDate, InquiryCategory__c, Source__c, TAG_NavUnit__c FROM CustomOpportunity__c",
+      "query": "SELECT Id, CreatedDate, LastModifiedDate FROM CustomOpportunity__c",
       "schema": {
         "Id": {
           "name": "id",
@@ -218,18 +218,6 @@
         "LastModifiedDate": {
           "name": "endret_dato",
           "type": "DATETIME"
-        },
-        "InquiryCategory__c": {
-          "name": "henvendelseskategori",
-          "type": "STRING"
-        },
-        "Source__c": {
-          "name": "kilde",
-          "type": "STRING"
-        },
-        "TAG_NavUnit__c": {
-          "name": "NAV_enhet_id",
-          "type": "STRING"
         }
       }
     }
