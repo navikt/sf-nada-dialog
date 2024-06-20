@@ -204,11 +204,31 @@
     }
   },
 "arbeidsgiver_data_dev": {
-  "arbeidsgiver_muligheter_dev": {
-      "query": "SELECT Id FROM CustomOpportunity__c",
+  "arbeidsgiver_mulighet_dev": {
+      "query": "SELECT Id, CreatedDate, LastModifiedDate, InquiryCategory__c, Source__c, TAG_NavUnit__c FROM CustomOpportunity__c",
       "schema": {
         "Id": {
           "name": "id",
+          "type": "STRING"
+        },
+        "CreatedDate": {
+          "name": "opprettet_dato",
+          "type": "DATETIME"
+        },
+        "LastModifiedDate": {
+          "name": "endret_dato",
+          "type": "DATETIME"
+        },
+        "InquiryCategory__c": {
+          "name": "henvendelseskategori",
+          "type": "STRING"
+        },
+        "Source__c": {
+          "name": "kilde",
+          "type": "STRING"
+        },
+        "TAG_NavUnit__c": {
+          "name": "NAV_enhet_id",
           "type": "STRING"
         }
       }
