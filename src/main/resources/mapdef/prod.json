@@ -1,7 +1,7 @@
 {
-  "arbeidsgiver_aktiviteter": {
-    "arbeidsgiver_moeter": {
-      "query": "SELECT Id, TAG_ActivityType__c, TAG_service__c, Subject, CreatedDate, LastModifiedDate, CRM_AccountOrgNumber__c, ActivityDate, TAG_AccountNAVUnit__c, TAG_AccountOrgType__c, TAG_UserNAVUnit__c, TAG_AccountParentId__c, TAG_AccountParentOrgNumber__c, TAG_Status__c, Type, CRM_Region__c, CRM_Unit__c, ReminderDateTime, RecordTypeId, StartDateTime, EndDateTime, EventSubtype, DurationInMinutes FROM Event",
+  "arbeidsgiver_aktiviteter_dev": {
+    "arbeidsgiver_moeter_dev": {
+      "query": "SELECT Id, TAG_ActivityType__c, TAG_service__c, Subject, CreatedDate, LastModifiedDate, CRM_AccountOrgNumber__c, ActivityDate, TAG_AccountNAVUnit__c, TAG_AccountOrgType__c, TAG_UserNAVUnit__c, TAG_AccountParentId__c, TAG_AccountParentOrgNumber__c, TAG_Status__c, Type, CRM_Region__c, CRM_Unit__c, ReminderDateTime, RecordTypeId, StartDateTime, EndDateTime, EventSubtype, DurationInMinutes, WhatId, WhoId FROM Event",
       "schema": {
         "Id": {
           "name": "id",
@@ -94,11 +94,19 @@
         "DurationInMinutes": {
           "name": "varighet",
           "type": "INTEGER"
+        },
+        "WhatId": {
+          "name": "relatert_til",
+          "type": "STRING"
+        },
+        "WhoId": {
+          "name": "relatert_til_hvem",
+          "type": "STRING"
         }
       }
     },
-    "arbeidsgiver_oppgaver": {
-      "query": "SELECT Id, TAG_ActivityType__c, TAG_service__c, Subject, CreatedDate, LastModifiedDate, CRM_AccountOrgNumber__c, ActivityDate, TAG_AccountNAVUnit__c, TAG_AccountOrgType__c, TAG_UserNAVUnit__c, TAG_AccountParentId__c, TAG_AccountParentOrgNumber__c, TAG_Status__c, Priority, Type, TaskSubtype, CRM_Region__c, CRM_Unit__c, ReminderDateTime, RecordTypeId FROM Task",
+    "arbeidsgiver_oppgaver_dev": {
+      "query": "SELECT Id, TAG_ActivityType__c, TAG_service__c, Subject, CreatedDate, LastModifiedDate, CRM_AccountOrgNumber__c, ActivityDate, TAG_AccountNAVUnit__c, TAG_AccountOrgType__c, TAG_UserNAVUnit__c, TAG_AccountParentId__c, TAG_AccountParentOrgNumber__c, TAG_Status__c, Priority, Type, TaskSubtype, CRM_Region__c, CRM_Unit__c, ReminderDateTime, RecordTypeId, WhatId, WhoId FROM Task",
       "schema": {
         "Id": {
           "name": "id",
@@ -193,6 +201,77 @@
           "type": "STRING"
         }
       }
-    } 
+    }
+  },
+"arbeidsgiver_data_dev": {
+  "arbeidsgiver_muligheter_dev": {
+      "query": "SELECT Id, Result__c, InclusionStage__c, InquiryCategory__c, Source__c, TAG_NavUnit__c, Account__c, Contact__c, CreatedDate, LastModifiedDate, Profession__c, ClosingDate__c, TAG_NAVUnitName__c, TAG_NAV_Unit_Region__c, TAG_NAV_Market_Region__c, AccountMunicipality__c FROM CustomOpportunity__c",
+      "schema": {
+        "Id": {
+          "name": "id",
+          "type": "STRING"
+        },
+        "Result__c": {
+          "name": "resultat",
+          "type": "STRING"
+        },
+        "InclusionStage__c": {
+          "name": "steg",
+          "type": "STRING"
+        },
+        "InquiryCategory__c": {
+          "name": "henvendelseskategori",
+          "type": "STRING"
+        },
+        "Source__c": {
+          "name": "kilde",
+          "type": "STRING"
+        },
+        "TAG_NavUnit__c": {
+          "name": "NAV_enhet_id",
+          "type": "STRING"
+        },
+        "Account__c": {
+          "name": "virksomhet_id",
+          "type": "STRING"
+        },
+        "Contact__c": {
+          "name": "kontaktperson_id",
+          "type": "STRING"
+        },
+        "CreatedDate": {
+          "name": "opprettet_dato",
+          "type": "DATETIME"
+        },
+        "LastModifiedDate": {
+          "name": "endret_dato",
+          "type": "DATETIME"
+        },
+        "Profession__c": {
+          "name": "yrke",
+          "type": "STRING"
+        },
+        "ClosingDate__c": {
+          "name": "sluttdato",
+          "type": "DATETIME"
+        },
+        "TAG_NAVUnitName__c": {
+          "name": "NAV_enhet_navn",
+          "type": "STRING"
+        },
+        "TAG_NAV_Unit_Region__c": {
+          "name": "NAV_enhet_region",
+          "type": "STRING"
+        },
+        "TAG_NAV_Market_Region__c": {
+          "name": "NAV_enhet_markedsregion",
+          "type": "STRING"
+        },
+        "AccountMunicipality__c": {
+          "name": "virksomhet_kommune",
+          "type": "STRING"
+        }
+      }
+    }
   }
 }
