@@ -68,7 +68,7 @@ fun envAsBoolean(env: String): Boolean { return System.getenv(env).trim().toBool
 
 fun envAsList(env: String): List<String> { return System.getenv(env).split(",").map { it.trim() }.toList() }
 
-enum class Type { STRING, INTEGER, DATETIME, BOOL }
+enum class Type { STRING, INTEGER, DATETIME, DATE, BOOL }
 data class FieldDef(val name: String, val type: Type)
 data class TableDef(val query: String, val fieldDefMap: MutableMap<String, FieldDef>)
 

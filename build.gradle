@@ -62,9 +62,6 @@ dependencies {
     implementation "org.http4k:http4k-server-apache:3.251.0"
     implementation "org.http4k:http4k-client-apache:3.251.0"
 
-    implementation "org.slf4j:slf4j-log4j12:1.2"
-    implementation "com.papertrailapp:logback-syslog4j:1.0.0"
-
     implementation "io.github.microutils:kotlin-logging:1.7.9"
     implementation "ch.qos.logback:logback-classic:1.4.14"
     implementation "net.logstash.logback:logstash-logback-encoder:7.4"
@@ -75,7 +72,7 @@ dependencies {
     implementation "org.apache.commons:commons-compress:1.26.0" //transient http4k-apache
     implementation "org.apache.httpcomponents:httpclient:4.5.13" //Desired transient httpclient to http4k-apache
     implementation "org.xerial.snappy:snappy-java:1.1.10.4" //Desired transient snappy to kafka-clients above
-
+    implementation "com.google.oauth-client:google-oauth-client:1.33.3"
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'

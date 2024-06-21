@@ -6,6 +6,7 @@ import no.nav.kafka.dialog.PrestopHook
 import no.nav.kafka.dialog.ShutdownHook
 import no.nav.kafka.dialog.enableNAISAPI
 import org.http4k.client.ApacheClient
+import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
@@ -50,11 +51,26 @@ object Bootstrap {
         log.info { "Starting app with settings: projectId $projectId, postTobigQuery $postToBigQuery, runSessionOnStartup $runSessionOnStartup, fetchAllRecords $fetchAllRecords, excludeTables $excludeTables" }
 
         enableNAISAPI {
-            log.info("Will wait half a minute with enabled NAIS API")
+            log.info { "1 minutes graceful start - establishing connections" }
+            Thread.sleep(60000)
+
+            // One offs (remember to remove after one run):
+            /*
+            oneOff("2024-05-23")
+            oneOff("2024-05-30")
+            oneOff("2024-06-03")
+            oneOff("2024-06-07")
+            oneOff("2024-06-10")
+            oneOff("2024-06-13")
+             */
+            //
+
             loop()
         }
         log.info { "App Finished!" }
     }
+
+    fun oneOff(localDateAsString: String) = work(LocalDate.parse(localDateAsString))
 
     private tailrec fun loop() {
 
