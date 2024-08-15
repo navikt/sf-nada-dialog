@@ -205,18 +205,10 @@
   },
 "arbeidsgiver_data_dev": {
   "arbeidsgiver_mulighet_dev": {
-      "query": "SELECT Id, Result__c, InclusionStage__c, CreatedDate, LastModifiedDate FROM CustomOpportunity__c",
+      "query": "SELECT Id, CreatedDate, LastModifiedDate FROM CustomOpportunity__c",
       "schema": {
         "Id": {
           "name": "id",
-          "type": "STRING"
-        },
-        "Result__c": {
-          "name": "resultat",
-          "type": "STRING"
-        },
-        "InclusionStage__c": {
-          "name": "steg",
           "type": "STRING"
         },
         "CreatedDate": {
