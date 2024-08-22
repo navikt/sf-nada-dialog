@@ -205,7 +205,7 @@
   },
 "arbeidsgiver_data_dev": {
   "arbeidsgiver_mulighet_dev": {
-      "query": "SELECT Id, CreatedDate, LastModifiedDate FROM CustomOpportunity__c",
+      "query": "SELECT Id, CreatedDate, LastModifiedDate FROM CustomOpportunity__c WHER RecordType.Name = 'Inclusion'",
       "schema": {
         "Id": {
           "name": "id",
