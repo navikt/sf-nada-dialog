@@ -53,7 +53,7 @@ spec:
     - name: FETCH_ALL_RECORDS
       value: 'false'
     - name: EXCLUDE_TABLES
-      value: ''
+      value: 'arbeidsgiver_oppgaver_dev, arbeidsgiver_moeter_dev'
     - name: MAPDEF_FILE
       value: '/mapdef/dev.json'
     - name: SF_TOKENHOST
