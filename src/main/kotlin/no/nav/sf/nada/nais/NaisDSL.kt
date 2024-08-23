@@ -78,26 +78,36 @@ fun naisAPI(): HttpHandler = routes(
 
         val queryYesterday = query.addYesterdayRestriction()
 
-        try {
-            val response = doSFQuery("${AccessTokenHandler.instanceUrl}$SF_QUERY_BASE$query")
-            File("/tmp/responseAtTotalCall").writeText(response.toMessage())
-            var obj = JsonParser.parseString(response.bodyString()) as JsonObject
-            val totalSize = obj["totalSize"].asInt
-            Metrics.latestTotalFromTestCall.labels(table).set(totalSize.toDouble())
-            result = "Total number of records found is $totalSize"
-        } catch (e: Exception) {
-            result += e.message
-            File("/tmp/exceptionAtTotalCall").writeText(e.toString() + "\n" + e.stackTraceToString())
+        val responseTotal = doSFQuery("${AccessTokenHandler.instanceUrl}$SF_QUERY_BASE$query")
+        File("/tmp/responseAtTotalCall").writeText(responseTotal.toMessage())
+        if (responseTotal.status.code == 400) {
+            result += "Bad request: " + responseTotal.bodyString()
+            File("/tmp/badRequestAtTotalCall").writeText(responseTotal.bodyString())
+        } else {
+            try {
+                val obj = JsonParser.parseString(responseTotal.bodyString()) as JsonObject
+                val totalSize = obj["totalSize"].asInt
+                Metrics.latestTotalFromTestCall.labels(table).set(totalSize.toDouble())
+                result = "Total number of records found is $totalSize"
+            } catch (e: Exception) {
+                result += e.message
+                File("/tmp/exceptionAtTotalCall").writeText(e.toString() + "\n" + e.stackTraceToString())
+            }
         }
-        try {
-            val response = doSFQuery("${AccessTokenHandler.instanceUrl}$SF_QUERY_BASE$queryYesterday")
-            File("/tmp/responseAtDateCall").writeText(response.toMessage())
-            var obj = JsonParser.parseString(response.bodyString()) as JsonObject
-            val totalSize = obj["totalSize"].asInt
-            result += "\nNumber of records from yesterday poll $totalSize"
-        } catch (e: Exception) {
-            result += e.message
-            File("/tmp/exceptionAtDateCall").writeText(e.toString() + "\n" + e.stackTraceToString())
+        val responseDate = doSFQuery("${AccessTokenHandler.instanceUrl}$SF_QUERY_BASE$queryYesterday")
+        File("/tmp/responseAtDateCall").writeText(responseDate.toMessage())
+        if (responseTotal.status.code == 400) {
+            result += "\nBad request: " + responseDate.bodyString()
+            File("/tmp/badRequestAtDateCall").writeText(responseDate.bodyString())
+        } else {
+            try {
+                val obj = JsonParser.parseString(responseDate.bodyString()) as JsonObject
+                val totalSize = obj["totalSize"].asInt
+                result += "\nNumber of records from yesterday poll $totalSize"
+            } catch (e: Exception) {
+                result += "\n" + e.message
+                File("/tmp/exceptionAtDateCall").writeText(e.toString() + "\n" + e.stackTraceToString())
+            }
         }
         Response(Status.OK).body(result)
     },
