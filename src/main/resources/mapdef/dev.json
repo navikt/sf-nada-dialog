@@ -205,7 +205,7 @@
   },
 "arbeidsgiver_data_dev": {
   "arbeidsgiver_mulighet_dev": {
-     "query": "SELECT Id, CreatedDate, LastModifiedDate, Result__c, InclusionStage__c, InquiryCategory__c, Source__c, TAG_NavUnit__c, Account__c, Contact__c, Profession__c, ClosingDate__c, TAG_NAVUnitName__c, TAG_NAV_Unit_Region__c, TAG_NAV_Market_Region__c, AccountMunicipality__c FROM CustomOpportunity__c WHERE Source__c='Internt tips'",
+     "query": "SELECT Id, CreatedDate, LastModifiedDate, Result__c, InclusionStage__c, InquiryCategory__c, Source__c, Account__c, Contact__c, Profession__c, ClosingDate__c, TAG_NAVUnitName__c, TAG_NAV_Unit_Region__c, TAG_NAV_Market_Region__c, AccountMunicipality__c FROM CustomOpportunity__c WHERE Source__c='Internt tips'",
       "schema": {
         "Id": {
           "name": "id",
@@ -233,10 +233,6 @@
         },
         "Source__c": {
           "name": "kilde",
-          "type": "STRING"
-        },
-        "TAG_NavUnit__c": {
-          "name": "NAV_enhet_id",
           "type": "STRING"
         },
         "Account__c": {
