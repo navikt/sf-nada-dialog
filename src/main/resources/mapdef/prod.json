@@ -205,11 +205,19 @@
   },
 "arbeidsgiver_data_dev": {
   "arbeidsgiver_muligheter_dev": {
-      "query": "SELECT Id, Result__c, InclusionStage__c, InquiryCategory__c, Source__c, TAG_NavUnit__c, Account__c, Contact__c, CreatedDate, LastModifiedDate, Profession__c, ClosingDate__c, TAG_NAVUnitName__c, TAG_NAV_Unit_Region__c, TAG_NAV_Market_Region__c, AccountMunicipality__c FROM CustomOpportunity__c",
+      "query": "SELECT Id, CreatedDate, LastModifiedDate, Result__c, InclusionStage__c, InquiryCategory__c, Source__c, TAG_NavUnit__c, Account__c, Contact__c, Profession__c, ClosingDate__c, TAG_NAVUnitName__c, TAG_NAV_Unit_Region__c, TAG_NAV_Market_Region__c, AccountMunicipality__c FROM CustomOpportunity__c",
       "schema": {
         "Id": {
           "name": "id",
           "type": "STRING"
+        },
+        "CreatedDate": {
+          "name": "opprettet_dato",
+          "type": "DATETIME"
+        },
+        "LastModifiedDate": {
+          "name": "endret_dato",
+          "type": "DATETIME"
         },
         "Result__c": {
           "name": "resultat",
