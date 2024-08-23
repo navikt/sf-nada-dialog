@@ -80,24 +80,24 @@ fun naisAPI(): HttpHandler = routes(
 
         try {
             val response = doSFQuery("${AccessTokenHandler.instanceUrl}$SF_QUERY_BASE$query")
+            File("/tmp/responseAtTotalCall").writeText(response.toMessage())
             var obj = JsonParser.parseString(response.bodyString()) as JsonObject
             val totalSize = obj["totalSize"].asInt
             Metrics.latestTotalFromTestCall.labels(table).set(totalSize.toDouble())
             result = "Total number of records found is $totalSize"
-            File("/tmp/responseToHappen").writeText(response.toMessage())
         } catch (e: Exception) {
             result += e.message
-            File("/tmp/exceptionatCall").writeText(e.toString())
+            File("/tmp/exceptionAtTotalCall").writeText(e.toString() + "\n" + e.stackTraceToString())
         }
         try {
             val response = doSFQuery("${AccessTokenHandler.instanceUrl}$SF_QUERY_BASE$queryYesterday")
+            File("/tmp/responseAtDateCall").writeText(response.toMessage())
             var obj = JsonParser.parseString(response.bodyString()) as JsonObject
             val totalSize = obj["totalSize"].asInt
             result += "\nNumber of records from yesterday poll $totalSize"
-            File("/tmp/responseToHappen2").writeText(response.toMessage())
         } catch (e: Exception) {
             result += e.message
-            File("/tmp/exceptionatCall2").writeText(e.toString())
+            File("/tmp/exceptionAtDateCall").writeText(e.toString() + "\n" + e.stackTraceToString())
         }
         Response(Status.OK).body(result)
     },
