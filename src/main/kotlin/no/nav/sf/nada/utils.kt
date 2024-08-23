@@ -72,9 +72,12 @@ enum class Type { STRING, INTEGER, DATETIME, DATE, BOOL }
 data class FieldDef(val name: String, val type: Type)
 data class TableDef(val query: String, val fieldDefMap: MutableMap<String, FieldDef>)
 
-fun parseMapDef(filePath: String): Map<String, Map<String, TableDef>> {
+fun parseMapDef(filePath: String): Map<String, Map<String, TableDef>> =
+    parseMapDef(JsonParser.parseString(Bootstrap::class.java.getResource(filePath).readText()) as JsonObject)
+
+fun parseMapDef(obj: JsonObject): Map<String, Map<String, TableDef>> {
     val result: MutableMap<String, MutableMap<String, TableDef>> = mutableMapOf()
-    val obj = JsonParser.parseString(Bootstrap::class.java.getResource(filePath).readText()) as JsonObject
+
     obj.entrySet().forEach { dataSetEntry ->
         val objDS = dataSetEntry.value.asJsonObject
         result[dataSetEntry.key] = mutableMapOf()
@@ -103,7 +106,8 @@ fun doSFQuery(query: String): Response {
 }
 
 fun String.addDateRestriction(localDate: LocalDate): String {
-    return this + "+WHERE+LastModifiedDate>=TODAY+AND+LastModifiedDate<=TOMORROW"
+    val connector = if (this.contains("WHERE")) "+AND" else "+WHERE"
+    return this + "$connector+LastModifiedDate>=TODAY+AND+LastModifiedDate<=TOMORROW"
         .replace("TODAY", "${localDate.format(DateTimeFormatter.ISO_DATE)}T00:00:00Z".urlEncoded())
         .replace("TOMORROW", "${localDate.plusDays(1).format(DateTimeFormatter.ISO_DATE)}T00:00:00Z".urlEncoded())
         .replace(">", ">".urlEncoded())

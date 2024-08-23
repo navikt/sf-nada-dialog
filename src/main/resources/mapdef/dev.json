@@ -205,7 +205,7 @@
   },
 "arbeidsgiver_data_dev": {
   "arbeidsgiver_mulighet_dev": {
-      "query": "SELECT Id, CreatedDate, LastModifiedDate FROM CustomOpportunity__c WHERE Source__c = 'Internt tips'",
+      "query": "SELECT Id, CreatedDate, LastModifiedDate FROM CustomOpportunity__c WHERE Source__c='Internt tips'",
       "schema": {
         "Id": {
           "name": "id",
