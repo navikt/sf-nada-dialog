@@ -43,6 +43,8 @@ spec:
      bigQueryDatasets:
       - name: arbeidsgiver_aktiviteter
         permission: READWRITE
+      - name: arbeidsgiver_data
+        permission: READWRITE
   accessPolicy:
     outbound:
       external:
@@ -50,7 +52,7 @@ spec:
         - host: navdialog.my.salesforce.com
   env:
     - name: POST_TO_BIGQUERY
-      value: 'false'
+      value: 'true'
     - name: RUN_SESSION_ON_STARTUP
       value: 'false'
     - name: FETCH_ALL_RECORDS
