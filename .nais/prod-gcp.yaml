@@ -54,7 +54,7 @@ spec:
     - name: POST_TO_BIGQUERY
       value: 'true'
     - name: RUN_SESSION_ON_STARTUP
-      value: 'false'
+      value: 'true'
     - name: FETCH_ALL_RECORDS
       value: 'false'
     - name: EXCLUDE_TABLES
