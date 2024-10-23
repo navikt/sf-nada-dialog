@@ -43,7 +43,7 @@ spec:
      bigQueryDatasets:
       - name: arbeidsgiver_aktiviteter
         permission: READWRITE
-      - name: arbeidsgiver_data
+      - name: arbeidsgiver_diverse
         permission: READWRITE
   accessPolicy:
     outbound:
