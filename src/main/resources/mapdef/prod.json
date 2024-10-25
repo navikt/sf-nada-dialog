@@ -236,7 +236,7 @@
     }
   },
 "arbeidsgiver_diverse": {
-  "arbeidsgiver_mulighet": {
+  "arbeidsgiver_muligheter": {
      "query": "SELECT Id, CreatedDate, LastModifiedDate, Result__c, InclusionStage__c, InquiryCategory__c, Source__c, Account__c, Contact__c, Profession__c, ClosingDate__c, TAG_NAVUnitName__c, TAG_NAV_Unit_Region__c, TAG_NAV_Market_Region__c, AccountMunicipality__c FROM CustomOpportunity__c",
       "schema": {
         "Id": {
