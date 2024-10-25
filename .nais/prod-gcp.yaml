@@ -58,9 +58,9 @@ spec:
     - name: RUN_SESSION_ON_STARTUP
       value: 'true'
     - name: FETCH_ALL_RECORDS
-      value: 'true'
+      value: 'false'
     - name: EXCLUDE_TABLES
-      value: 'arbeidsgiver_moeter, arbeidsgiver_oppgaver'
+      value: 'arbeidsgiver_oppgaver, arbeidsgiver_muligheter'
     - name: MAPDEF_FILE
       value: '/mapdef/prod.json'
     - name: SF_TOKENHOST
