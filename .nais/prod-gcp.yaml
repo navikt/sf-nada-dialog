@@ -45,6 +45,8 @@ spec:
         permission: READWRITE
       - name: arbeidsgiver_diverse
         permission: READWRITE
+      - name: arbeidsgiver_data
+        permission: READWRITE
   accessPolicy:
     outbound:
       external:
