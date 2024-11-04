@@ -54,13 +54,13 @@ spec:
         - host: navdialog.my.salesforce.com
   env:
     - name: POST_TO_BIGQUERY
-      value: 'false'
+      value: 'true'
     - name: RUN_SESSION_ON_STARTUP
-      value: 'true'
+      value: 'false'
     - name: FETCH_ALL_RECORDS
-      value: 'true'
+      value: 'false'
     - name: EXCLUDE_TABLES
-      value: 'arbeidsgiver_oppgaver, arbeidsgiver_muligheter'
+      value: ''
     - name: MAPDEF_FILE
       value: '/mapdef/prod.json'
     - name: SF_TOKENHOST
