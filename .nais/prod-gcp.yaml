@@ -60,7 +60,7 @@ spec:
     - name: FETCH_ALL_RECORDS
       value: 'true'
     - name: EXCLUDE_TABLES
-      value: ''
+      value: 'arbeidsgiver_oppgaver, arbeidsgiver_muligheter'
     - name: MAPDEF_FILE
       value: '/mapdef/prod.json'
     - name: SF_TOKENHOST

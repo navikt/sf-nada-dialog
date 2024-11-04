@@ -36,6 +36,7 @@ private val log = KotlinLogging.logger { }
 
 fun naisAPI(): HttpHandler = routes(
     "/examine" bind Method.GET to static(Classpath("examine")),
+    "/bulk" bind Method.GET to static(Classpath("bulk")),
     "/htmlforconfig" bind Method.GET to {
         var htmlTemplate = "<div id=\"config\" style=\"font-size:14px\n" +
             "    ; font-weight:bold\">PROJECTID<br>POST_TO_BIGQUERY<br>RUN_SESSION_ON_STARTUP<br>FETCH_ALL_RECORDS<br>EXCLUDE_TABLES</div>"
