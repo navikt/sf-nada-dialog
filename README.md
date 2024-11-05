@@ -59,7 +59,7 @@ Note that you can map nested fields in Salesforce. I.e "LiveChatButton.MasterLab
 
 ### Examine-ingesses
 
-You can use the examine ingresses (https://sf-nada-dialog.dev.intern.nav.no/examine, https://sf-nada-dialog.intern.nav.no/examine) to examine the state of the app in dev and prod. Here you can click on the dataset- and table buttons
+You can use the examine ingresses (https://sf-nada-dialog.dev.intern.nav.no/internal/examine, https://sf-nada-dialog.intern.nav.no/internal/examine) to examine the state of the app in dev and prod. Here you can click on the dataset- and table buttons
 to verify how the current deployed map definition file are being parsed by the app. You can also run the query for that table (returning a total count) to see if the fetch from salesforce
 goes through successfully.
 

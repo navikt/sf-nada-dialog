@@ -6,55 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <style>
-        .dropbtn {
-            background-color: #3498DB;
-            color: white;
-            padding: 16px;
-            font-size: 16px;
-            border: none;
-            cursor: pointer;
-        }
-
-        .bulkbtn {
-            background-color: #db3434;
-            color: white;
-            padding: 16px;
-            font-size: 16px;
-            border: none;
-            cursor: pointer;
-        }
-
-        .dropbtn:hover, .dropbtn:focus {
-            background-color: #2980B9;
-        }
-
-        .datasetDropdownHolder {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #f1f1f1;
-            min-width: 160px;
-            overflow: auto;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
-        }
-
-        .dropdown-content a {
-            color: black;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-        }
-
-        a:hover {background-color: #ddd}
-
-        .show {display: block;}
-    </style>
+    <link rel="stylesheet" href="/internal/bulk/style.css">
 </head>
 <body>
 
@@ -73,160 +25,19 @@
     </div>
 </div>
 <div class="bulkStartHolder" style="float:left">
-    <button id="bulkStartBtn" onclick="bulkStartBtnClick()" class="bulkbtn" style="display: none;">Start fetch all</button>
+    <button id="bulkStartBtn" onclick="bulkStartBtnClick()" class="bulkbtn">Start fetch all</button>
 </div>
-<br><br><br><br><br>
+
+<div class="jobIdHolder" style="float:left; margin-right: 5px">
+    <input type="text" id="activeJobId" placeholder="Active job id" style="padding: 5px; height: 32px; border-radius: 4px; border: 1px solid #ccc;">
+    <button id="reconnectBtn" onclick="reconnectBtnClick()" class="dropbtn">Reconnect</button>
+</div>
+<br><br><br><br>
 <div id="report" style="word-wrap: anywhere"></div>
 <br>
 <div id="testreport"></div>
 
-<script>
-    window.onload = function() {
-        console.log("Do on load");
-        addConfigDescriptionAction();
-        populateAction();
-    };
-
-    const populateAction = async () => {
-        const response = await fetch('/internal/datasets', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        var j = await response.json();
-
-        let datasetDrop = document.getElementById("datasetDropdown");
-
-        for (let i = 0; i < j.length; i++) {
-            datasetDrop.innerHTML += '<a onclick="datasetSelect(\''+j[i]+'\')">'+j[i]+'</a>';
-        }
-    }
-    function datasetDropdownBtnClick() {
-        document.getElementById("datasetDropdown").classList.toggle("show");
-    }
-    function datasetSelect(name) {
-        document.getElementById("datasetDropdownBtn").innerHTML = name;
-        document.getElementById("tableDropdownBtn").innerHTML = "Table"
-        document.getElementById("report").innerHTML = ""
-
-        populateTableAction(name)
-    }
-
-    const populateTableAction = async ( dataset ) => {
-        const response = await fetch('/internal/tables?dataset='+dataset, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        var j = await response.json();
-
-        let tableDrop = document.getElementById("tableDropdown");
-
-        for (let i = 0; i < j.length; i++) {
-            if (i == 0) {
-                tableDrop.innerHTML = '<a>Table</a>';
-            }
-            tableDrop.innerHTML += '<a onclick="tableSelect(\''+dataset+'\',\''+j[i]+'\')">'+j[i]+'</a>';
-        }
-    }
-
-    const populateSchemaMapAction = async ( dataset, table ) => {
-        const response = await fetch('/internal/schemamap?dataset='+dataset+'&table='+table, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'text/html'
-            }
-        });
-
-        var t = await response.text();
-
-        let reportdst = document.getElementById("report");
-
-        reportdst.innerHTML = t.replaceAll("\n","<br>") + '<br><br><br><a class="dropbtn" onclick="runTest(\''+dataset+'\',\''+table+'\')">Perform query and count</a>';
-    }
-
-    const populateTestResultAction = async ( dataset, table ) => {
-        let reportdst = document.getElementById("testreport");
-        reportdst.innerHTML = "<br>Pending..."
-        const response = await fetch('/internal/testcall?dataset='+dataset+'&table='+table, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'text/html'
-            }
-        });
-
-        var t = await response.text();
-
-        reportdst.innerHTML = "<br>" + t.replaceAll("\n","<br>")
-    }
-
-    const addConfigDescriptionAction = async ( ) => {
-        const response = await fetch('/internal/htmlforconfig', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'text/html'
-            }
-        });
-
-        var h = await response.text();
-
-        let dst = document.body
-
-        dst.innerHTML = dst.innerHTML + h
-    }
-
-    function tableDropdownBtnClick() {
-        document.getElementById("tableDropdown").classList.toggle("show");
-    }
-    let selectedForBulkDataset;
-
-    let selectedForBulkTable;
-
-    function tableSelect(dataset, table) {
-        document.getElementById("tableDropdownBtn").innerHTML = table;
-        document.getElementById("bulkStartBtn").classList.toggle("show")
-        selectedForBulkDataset = table;
-        selectedForBulkTable = table;
-        populateSchemaMapAction(dataset, table)
-    }
-    function runTest(dataset, table) {
-        populateTestResultAction(dataset, table)
-    }
-
-    selectedForBulkDataset = '';
-    selectedForBulkTable = '';
-
-    function bulkStartBtnClick() {
-        alert(`Will do batch on ${selectedForBulkDataset} ${selectedForBulkTable}`);
-        const response = fetch('/internal/performBulk?dataset='+dataset+'&table='+table, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'text/html'
-            }
-        });
-
-        var t = response.text()
-        alert(t)
-    }
-
-    // Close the dropdown if the user clicks outside of it
-    window.onclick = function(event) {
-        if (!event.target.matches('.dropbtn')) {
-            var dropdowns = document.getElementsByClassName("dropdown-content");
-            var i;
-            for (i = 0; i < dropdowns.length; i++) {
-                var openDropdown = dropdowns[i];
-                if (openDropdown.classList.contains('show')) {
-                    openDropdown.classList.remove('show');
-                }
-            }
-        }
-    }
-</script>
+<script src="/internal/bulk/script.js"></script>
 
 </body>
 </html>
