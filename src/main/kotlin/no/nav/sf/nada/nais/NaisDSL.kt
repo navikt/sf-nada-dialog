@@ -16,6 +16,7 @@ import no.nav.sf.nada.Metrics
 import no.nav.sf.nada.Metrics.cRegistry
 import no.nav.sf.nada.addYesterdayRestriction
 import no.nav.sf.nada.bulk.BulkOperation
+import no.nav.sf.nada.doSFBulkStartQuery
 import no.nav.sf.nada.doSFQuery
 import no.nav.sf.nada.gson
 import no.nav.sf.nada.token.AccessTokenHandler
@@ -141,7 +142,8 @@ fun naisAPI(): HttpHandler = routes(
             BulkOperation.dataset = dataset!!
             BulkOperation.table = table!!
             BulkOperation.operationIsActive = true
-            Response(Status.OK).body("Will start ${BulkOperation.dataset} ${BulkOperation.table}")
+            val bulkResponse = doSFBulkStartQuery(BulkOperation.dataset, BulkOperation.table)
+            Response(Status.OK).body("Will start ${BulkOperation.dataset} ${BulkOperation.table} - ${bulkResponse.bodyString()}")
         } else {
             Response(Status.OK).body("Already started jobID ${BulkOperation.jobId} with ${BulkOperation.dataset} ${BulkOperation.table}")
         }
