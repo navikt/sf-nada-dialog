@@ -140,7 +140,9 @@ fun doSFBulkJobResultQuery(jobId: String): Response {
     val request = Request(Method.GET, "${AccessTokenHandler.instanceUrl}/services/data/v57.0/jobs/query/$jobId/results")
         .header("Authorization", "Bearer ${AccessTokenHandler.accessToken}")
         .header("Content-Type", "application/json;charset=UTF-8")
+
     val response = Bootstrap.client.value(request)
+    File("/tmp/bulkJobResultResponse").writeText(response.toMessage())
     return response
 }
 
