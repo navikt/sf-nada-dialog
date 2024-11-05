@@ -223,22 +223,14 @@ function showCompletionMessage(data) {
     // Display completion message with records processed
     document.getElementById('status').innerHTML = 'Job Complete, records processed: ' + data.numberRecordsProcessed + ', job id:' + data.id
 
-    // Create the "Transfer data" button
-    const transferButton = document.createElement('button');
-    transferButton.className = 'bulkbtn'; // Apply the same style as bulkbtn
-    transferButton.innerText = 'Transfer data';
-
     // Add event listener for the button
-    transferButton.addEventListener('click', function() {
+    document.getElementById('startTransfer').addEventListener('click', function() {
         const confirmTransfer = confirm(`Would you like to start bulk transfer of ${data.numberRecordsProcessed} records?`);
         if (confirmTransfer) {
             // Call the function to start bulk transfer here
             startBulkTransfer(data.numberRecordsProcessed);
         }
     });
-
-    // Append the button to the status element
-    document.getElementById('status').appendChild(transferButton);
 }
 
 function startBulkTransfer(numberRecords) {
