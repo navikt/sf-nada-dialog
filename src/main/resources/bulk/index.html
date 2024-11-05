@@ -72,8 +72,8 @@
         <a>Table</a>
     </div>
 </div>
-<div class="bulkStartHolder" style="float:left; display: none;">
-    <button id="bulkStartBtn" onclick="bulkStartBtnClick()" class="bulkbtn">Start fetch all</button>
+<div class="bulkStartHolder" style="float:left">
+    <button id="bulkStartBtn" onclick="bulkStartBtnClick()" class="bulkbtn" style="display: none;">Start fetch all</button>
 </div>
 <br><br><br><br><br>
 <div id="report" style="word-wrap: anywhere"></div>
@@ -201,7 +201,16 @@
     selectedForBulkTable = '';
 
     function bulkStartBtnClick() {
-        alert("Will do batch on ${selectedForBulkDataset} ${selectedForBulkTable}");
+        alert(`Will do batch on ${selectedForBulkDataset} ${selectedForBulkTable}`);
+        const response = fetch('/internal/performBulk?dataset='+dataset+'&table='+table, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'text/html'
+            }
+        });
+
+        var t = response.text()
+        alert(t)
     }
 
     // Close the dropdown if the user clicks outside of it

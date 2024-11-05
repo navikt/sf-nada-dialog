@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="shortcut icon" type="image/x-icon" href="/examine/ico.png">
+    <link rel="shortcut icon" type="image/x-icon" href="/internal/examine/ico.png">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
@@ -76,7 +76,7 @@
     };
 
     const populateAction = async () => {
-        const response = await fetch('/datasets', {
+        const response = await fetch('/internal/datasets', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -104,7 +104,7 @@
     }
 
     const populateTableAction = async ( dataset ) => {
-        const response = await fetch('/tables?dataset='+dataset, {
+        const response = await fetch('/internal/tables?dataset='+dataset, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -124,7 +124,7 @@
     }
 
     const populateSchemaMapAction = async ( dataset, table ) => {
-        const response = await fetch('/schemamap?dataset='+dataset+'&table='+table, {
+        const response = await fetch('/internal/schemamap?dataset='+dataset+'&table='+table, {
             method: 'GET',
             headers: {
                 'Content-Type': 'text/html'
@@ -141,7 +141,7 @@
     const populateTestResultAction = async ( dataset, table ) => {
         let reportdst = document.getElementById("testreport");
         reportdst.innerHTML = "<br>Pending..."
-        const response = await fetch('/testcall?dataset='+dataset+'&table='+table, {
+        const response = await fetch('/internal/testcall?dataset='+dataset+'&table='+table, {
             method: 'GET',
             headers: {
                 'Content-Type': 'text/html'
@@ -154,7 +154,7 @@
     }
 
     const addConfigDescriptionAction = async ( ) => {
-        const response = await fetch('/htmlforconfig', {
+        const response = await fetch('/internal/htmlforconfig', {
             method: 'GET',
             headers: {
                 'Content-Type': 'text/html'

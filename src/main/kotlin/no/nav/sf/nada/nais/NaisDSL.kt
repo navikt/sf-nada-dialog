@@ -15,6 +15,7 @@ import no.nav.sf.nada.Bootstrap.runSessionOnStartup
 import no.nav.sf.nada.Metrics
 import no.nav.sf.nada.Metrics.cRegistry
 import no.nav.sf.nada.addYesterdayRestriction
+import no.nav.sf.nada.bulk.BulkOperation
 import no.nav.sf.nada.doSFQuery
 import no.nav.sf.nada.gson
 import no.nav.sf.nada.token.AccessTokenHandler
@@ -132,6 +133,18 @@ fun naisAPI(): HttpHandler = routes(
         PrestopHook.activate()
         log.info { "Received PreStopHook from NAIS" }
         Response(Status.OK)
+    },
+    "/internal/performBulk" bind Method.GET to {
+        if (!BulkOperation.operationIsActive) {
+            val dataset = it.query("dataset")
+            val table = it.query("table")
+            BulkOperation.dataset = dataset!!
+            BulkOperation.table = table!!
+            BulkOperation.operationIsActive = true
+            Response(Status.OK).body("Will start ${BulkOperation.dataset} ${BulkOperation.table}")
+        } else {
+            Response(Status.OK).body("Already started jobID ${BulkOperation.jobId} with ${BulkOperation.dataset} ${BulkOperation.table}")
+        }
     }
 )
 
