@@ -117,16 +117,16 @@ function runTest(dataset, table) {
 selectedForBulkDataset = '';
 selectedForBulkTable = '';
 
-function bulkStartBtnClick() {
+async function bulkStartBtnClick() {
     const userConfirmed = confirm(`Will do batch on ${selectedForBulkDataset} ${selectedForBulkTable}`);
-    const response = fetch('/internal/performBulk?dataset='+selectedForBulkDataset+'&table='+selectedForBulkTable, {
+    const response = await fetch('/internal/performBulk?dataset='+selectedForBulkDataset+'&table='+selectedForBulkTable, {
         method: 'GET',
         headers: {
             'Content-Type': 'text/html'
         }
     });
 
-    var t = response.text()
+    const t = await response.text()
     alert(t + " userconfirmed" + userConfirmed)
 }
 
