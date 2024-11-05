@@ -125,6 +125,16 @@ fun doSFBulkStartQuery(dataset: String, table: String): Response {
     return response
 }
 
+fun doSFBulkJobStatusQuery(jobId: String): Response {
+    val request = Request(Method.GET, "${AccessTokenHandler.instanceUrl}/services/data/v57.0/jobs/query/$jobId")
+        .header("Authorization", "Bearer ${AccessTokenHandler.accessToken}")
+        .header("Content-Type", "application/json;charset=UTF-8")
+    File("/tmp/bulkJobStatusQueryToHappen").writeText(request.toMessage())
+    val response = Bootstrap.client.value(request)
+    File("/tmp/bulkJobStatusResponseThatHappend").writeText(response.toMessage())
+    return response
+}
+
 fun String.addDateRestriction(localDate: LocalDate): String {
     val connector = if (this.contains("WHERE")) "+AND" else "+WHERE"
     return this + "$connector+LastModifiedDate>=TODAY+AND+LastModifiedDate<=TOMORROW"

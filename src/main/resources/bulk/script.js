@@ -119,16 +119,18 @@ selectedForBulkDataset = '';
 selectedForBulkTable = '';
 
 async function bulkStartBtnClick() {
-    const userConfirmed = confirm(`Will do batch on ${selectedForBulkDataset} ${selectedForBulkTable}`);
-    const response = await fetch('/internal/performBulk?dataset='+selectedForBulkDataset+'&table='+selectedForBulkTable, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'text/html'
-        }
-    });
+    const userConfirmed = confirm(`This will start batch job for ${selectedForBulkDataset} ${selectedForBulkTable}?`);
+    if (userConfirmed) {
+        const response = await fetch('/internal/performBulk?dataset=' + selectedForBulkDataset + '&table=' + selectedForBulkTable, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'text/html'
+            }
+        });
 
-    const t = await response.text()
-    alert(t + " userconfirmed" + userConfirmed)
+        const t = await response.text()
+        alert(t)
+    }
 }
 
 // Close the dropdown if the user clicks outside of it
@@ -145,10 +147,19 @@ window.onclick = function(event) {
     }
 }
 
-function reconnectBtnClick() {
+async function reconnectBtnClick() {
     const jobId = document.getElementById('activeJobId').value;
     if (jobId) {
         alert(`Reconnecting to job ID: ${jobId}`);
+        const response = await fetch('/internal/reconnect?id=' + jobId, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'text/html'
+            }
+        });
+
+        const t = await response.text()
+        alert(t)
         // Add logic here to handle the reconnect action based on jobId
     } else {
         alert('Please enter a job ID to reconnect.');

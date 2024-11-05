@@ -8,7 +8,7 @@ object BulkOperation {
 
     var table: String = ""
 
-    val jobId: Long = 0L
+    var jobId: String = ""
 }
 
 /**

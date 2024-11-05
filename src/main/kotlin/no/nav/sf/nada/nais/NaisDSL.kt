@@ -16,6 +16,7 @@ import no.nav.sf.nada.Metrics
 import no.nav.sf.nada.Metrics.cRegistry
 import no.nav.sf.nada.addYesterdayRestriction
 import no.nav.sf.nada.bulk.BulkOperation
+import no.nav.sf.nada.doSFBulkJobStatusQuery
 import no.nav.sf.nada.doSFBulkStartQuery
 import no.nav.sf.nada.doSFQuery
 import no.nav.sf.nada.gson
@@ -141,12 +142,35 @@ fun naisAPI(): HttpHandler = routes(
             val table = it.query("table")
             BulkOperation.dataset = dataset!!
             BulkOperation.table = table!!
-            BulkOperation.operationIsActive = true
+
             val bulkResponse = doSFBulkStartQuery(BulkOperation.dataset, BulkOperation.table)
-            Response(Status.OK).body("Will start ${BulkOperation.dataset} ${BulkOperation.table} - ${bulkResponse.bodyString()}")
-        } else {
-            Response(Status.OK).body("Already started jobID ${BulkOperation.jobId} with ${BulkOperation.dataset} ${BulkOperation.table}")
+
+            try {
+                val responseObj = JsonParser.parseString(bulkResponse.bodyString()) as JsonObject
+                BulkOperation.jobId = responseObj["id"].asString
+                BulkOperation.operationIsActive = true
+                // Response(Status.OK).body(bulkResponse.bodyString())
+            } catch (e: Exception) {
+                log.error { e.stackTraceToString() }
+                Response(Status.OK).body("Something went wrong with bulk start, response from SF ${bulkResponse.status.code} ${bulkResponse.bodyString()}")
+            }
         }
+        val bulkJobStatusResponse = doSFBulkJobStatusQuery(BulkOperation.jobId)
+        try {
+            val responseObj = JsonParser.parseString(bulkJobStatusResponse.bodyString()) as JsonObject
+            BulkOperation.jobId = responseObj["id"].asString
+            BulkOperation.operationIsActive = true
+        } catch (e: Exception) {
+            log.error { e.stackTraceToString() }
+            Response(Status.OK).body("Something went wrong with check, response from SF ${bulkJobStatusResponse.status.code} ${bulkJobStatusResponse.bodyString()}")
+        }
+        Response(Status.OK).body(bulkJobStatusResponse.bodyString())
+    },
+    "/internal/reconnect" bind Method.GET to {
+        val id = it.query("id")
+        BulkOperation.jobId = id!!
+        log.info { "Reconnecting gui to jobId $id" }
+        Response(Status.OK).body("Reconnected to jobId $id")
     }
 )
 
