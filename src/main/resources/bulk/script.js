@@ -2,7 +2,47 @@ window.onload = function() {
     console.log("Do on load");
     addConfigDescriptionAction();
     populateAction();
+
+    checkActiveId()
 };
+
+const statusElement = document.getElementById('status');
+
+function checkActiveId() {
+    fetch('/internal/activeId')
+        .then(response => response.text())  // Use .text() to handle plain text response
+        .then(data => {
+            if (data.trim()) {  // If there's a non-empty ID in the response
+                const activeId = data.trim(); // Extract the ID from the response
+                statusElement.innerHTML = 'Active ID found: ' + activeId;
+                performBulk(activeId);
+            } else {
+                statusElement.innerHTML = 'No active ID found';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching active ID:', error);
+        });
+}
+
+function performBulk(activeId) {
+    fetch('/internal/performBulk?id=' + activeId)
+        .then(response => response.json())
+        .then(data => {
+            // Display the response in the status element
+            statusElement.innerHTML = 'Performing bulk action: ' + JSON.stringify(data);
+
+            // Check the state of the bulk job every 3 seconds
+            if (data.state && data.state === 'JobComplete') {
+                statusElement.innerHTML = 'Job Complete: ' + JSON.stringify(data);
+            } else {
+                setTimeout(() => performBulk(activeId), 3000); // Retry after 3 seconds
+            }
+        })
+        .catch(error => {
+            console.error('Error performing bulk action:', error);
+        });
+}
 
 const populateAction = async () => {
     const response = await fetch('/internal/datasets', {

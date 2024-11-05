@@ -169,8 +169,12 @@ fun naisAPI(): HttpHandler = routes(
     "/internal/reconnect" bind Method.GET to {
         val id = it.query("id")
         BulkOperation.jobId = id!!
+        BulkOperation.operationIsActive = true
         log.info { "Reconnecting gui to jobId $id" }
         Response(Status.OK).body("Reconnected to jobId $id")
+    },
+    "/internal/activeId" bind Method.GET to {
+        Response(Status.OK).body(if (BulkOperation.operationIsActive) BulkOperation.jobId else "")
     }
 )
 
