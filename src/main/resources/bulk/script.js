@@ -6,20 +6,18 @@ window.onload = function() {
     checkActiveId()
 };
 
-const statusElement = document.getElementById('status');
-
 function checkActiveId() {
     fetch('/internal/activeId')
         .then(response => response.text())  // Use .text() to handle plain text response
         .then(data => {
             if (data.trim()) {  // If there's a non-empty ID in the response
                 const activeId = data.trim(); // Extract the ID from the response
-                statusElement.innerHTML = 'Active ID found: ' + activeId;
+                document.getElementById('status').innerHTML = 'Active ID found: ' + activeId;
 
                 hideSelectElements()
                 performBulk();
             } else {
-                statusElement.innerHTML = 'No active ID found';
+                document.getElementById('status').innerHTML = 'No active ID found';
             }
         })
         .catch(error => {
@@ -32,15 +30,15 @@ function performBulk() {
         .then(response => response.json())
         .then(data => {
             // Display the response in the status element
-            statusElement.innerHTML = 'Performing bulk action: ' + JSON.stringify(data);
+            document.getElementById('status').innerHTML = 'Performing bulk action: ' + JSON.stringify(data);
 
             console.log('performBulk response:', data);
             console.log('performBulk stringify:', JSON.stringify(data));
             // Check the state of the bulk job every 3 seconds
             if (data.state && data.state === 'JobComplete') {
-                document.getElementById('status').innerHTML = 'Job Complete: ' + JSON.stringify(data);
+                showCompletionMessage(data)
             } else {
-                document.getElementById('status').innerHTML = JSON.stringify(data);
+                document.getElementById('status').innerHTML = 'Status: '+ data.state + ', records processed ' + data.numberRecordsProcessed;
                 setTimeout(() => performBulk(), 3000); // Retry after 3 seconds
             }
         })
@@ -215,8 +213,36 @@ async function reconnectBtnClick() {
 
 function hideSelectElements() {
     // Select elements by class name and hide them
-    const elementsToHide = document.querySelectorAll('.jobIdHolder, .datasetDropdownHolder, .tableDropdownHolder, .bulkStartHolder');
+    const elementsToHide = document.querySelectorAll('.jobIdHolder, .datasetDropdownHolder, .tableDropdownHolder, .bulkStartHolder, #description');
     elementsToHide.forEach(element => {
         element.style.display = 'none';
     });
+}
+
+function showCompletionMessage(data) {
+    // Display completion message with records processed
+    document.getElementById('status').innerHTML = 'Job Complete, records processed: ' + data.numberRecordsProcessed;
+
+    // Create the "Transfer data" button
+    const transferButton = document.createElement('button');
+    transferButton.className = 'bulkbtn'; // Apply the same style as bulkbtn
+    transferButton.innerText = 'Transfer data';
+
+    // Add event listener for the button
+    transferButton.addEventListener('click', function() {
+        const confirmTransfer = confirm(`Would you like to start bulk transfer of ${data.numberRecordsProcessed} records?`);
+        if (confirmTransfer) {
+            // Call the function to start bulk transfer here
+            startBulkTransfer(data.numberRecordsProcessed);
+        }
+    });
+
+    // Append the button to the status element
+    document.getElementById('status').appendChild(transferButton);
+}
+
+function startBulkTransfer(numberRecords) {
+    // Placeholder function for the bulk transfer logic
+    alert(`Starting bulk transfer of ${numberRecords} records...`);
+    // Implement your bulk transfer logic here
 }
