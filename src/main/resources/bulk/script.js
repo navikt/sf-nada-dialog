@@ -33,7 +33,7 @@ function performBulk() {
             statusElement.innerHTML = 'Performing bulk action: ' + JSON.stringify(data);
 
             console.log('performBulk response:', data);
-            console.log('performBulk stringify:', JSON.stringify(data);
+            console.log('performBulk stringify:', JSON.stringify(data));
             // Check the state of the bulk job every 3 seconds
             if (data.state && data.state === 'JobComplete') {
                 statusElement.innerHTML = 'Job Complete: ' + JSON.stringify(data);
