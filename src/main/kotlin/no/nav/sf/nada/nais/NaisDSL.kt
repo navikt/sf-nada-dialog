@@ -35,9 +35,9 @@ import java.io.StringWriter
 private val log = KotlinLogging.logger { }
 
 fun naisAPI(): HttpHandler = routes(
-    "/examine" bind Method.GET to static(Classpath("examine")),
-    "/bulk" bind Method.GET to static(Classpath("bulk")),
-    "/htmlforconfig" bind Method.GET to {
+    "/internal/examine" bind Method.GET to static(Classpath("examine")),
+    "/internal/bulk" bind Method.GET to static(Classpath("bulk")),
+    "/internal/htmlforconfig" bind Method.GET to {
         var htmlTemplate = "<div id=\"config\" style=\"font-size:14px\n" +
             "    ; font-weight:bold\">PROJECTID<br>POST_TO_BIGQUERY<br>RUN_SESSION_ON_STARTUP<br>FETCH_ALL_RECORDS<br>EXCLUDE_TABLES</div>"
         htmlTemplate = htmlTemplate
@@ -48,14 +48,14 @@ fun naisAPI(): HttpHandler = routes(
             .replace("EXCLUDE_TABLES", "Skip fetching records for the following tables: $excludeTables")
         Response(Status.OK).body(htmlTemplate)
     },
-    "/datasets" bind Method.GET to {
+    "/internal/datasets" bind Method.GET to {
         Response(Status.OK).body(gson.toJson(Bootstrap.mapDef.keys))
     },
-    "/tables" bind Method.GET to { req: Request ->
+    "/internal/tables" bind Method.GET to { req: Request ->
         val dataset = req.query("dataset")
         Response(Status.OK).body(gson.toJson(Bootstrap.mapDef[dataset]!!.keys))
     },
-    "/schemamap" bind Method.GET to { req: Request ->
+    "/internal/schemamap" bind Method.GET to { req: Request ->
         val dataset = req.query("dataset")
         val table = req.query("table")
         val query = Bootstrap.mapDef[dataset]!![table]!!.query
@@ -69,7 +69,7 @@ fun naisAPI(): HttpHandler = routes(
 
         Response(Status.OK).body(result)
     },
-    "/testcall" bind Method.GET to { req: Request ->
+    "/internal/testcall" bind Method.GET to { req: Request ->
         log.info { "Will perform testcall " }
         File("/tmp/latesttestcallrequest").writeText(req.toMessage())
         var result = ""
@@ -112,9 +112,9 @@ fun naisAPI(): HttpHandler = routes(
         }
         Response(Status.OK).body(result)
     },
-    "/isAlive" bind Method.GET to { Response(Status.OK) },
-    "/isReady" bind Method.GET to { Response(Status.OK) },
-    "/metrics" bind Method.GET to {
+    "/internal/isAlive" bind Method.GET to { Response(Status.OK) },
+    "/internal/isReady" bind Method.GET to { Response(Status.OK) },
+    "/internal/metrics" bind Method.GET to {
         runCatching {
             StringWriter().let { str ->
                 TextFormat.write004(str, cRegistry.metricFamilySamples())
@@ -127,7 +127,7 @@ fun naisAPI(): HttpHandler = routes(
             .getOrDefault("")
             .responseByContent()
     },
-    "/stop" bind Method.GET to {
+    "/internal/stop" bind Method.GET to {
         preStopHook.inc()
         PrestopHook.activate()
         log.info { "Received PreStopHook from NAIS" }
