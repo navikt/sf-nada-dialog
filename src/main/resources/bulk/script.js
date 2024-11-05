@@ -229,8 +229,11 @@ function showCompletionMessage(data) {
         if (confirmTransfer) {
             // Call the function to start bulk transfer here
             startBulkTransfer(data.numberRecordsProcessed);
+            document.getElementById('startTransfer').classList.remove("show")
         }
     });
+
+    document.getElementById('startTransfer').classList.add("show")
 }
 
 function startBulkTransfer(numberRecords) {
