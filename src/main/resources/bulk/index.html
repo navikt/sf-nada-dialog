@@ -12,6 +12,11 @@
 
 <h2>Bulk operation</h2>
 <p>Pick dataset and table to start new bulk operation. Or enter job id to recover previous session</p>
+<div class="jobIdHolder" style="float:left; margin-right: 5px">
+    <input type="text" id="activeJobId" placeholder="Active job id" style="padding: 5px; height: 32px; border-radius: 4px; border: 1px solid #ccc;">
+    <button id="reconnectBtn" onclick="reconnectBtnClick()" class="dropbtn">Reconnect</button>
+</div>
+<br><br><br><br><br>
 <div class="datasetDropdownHolder" style="float:left; margin-right: 5px">
     <button id="datasetDropdownBtn" onclick="datasetDropdownBtnClick()" class="dropbtn">Dataset</button>
     <div id="datasetDropdown" class="dropdown-content">
@@ -28,11 +33,7 @@
     <button id="bulkStartBtn" onclick="bulkStartBtnClick()" class="bulkbtn">Start fetch all</button>
 </div>
 
-<div class="jobIdHolder" style="float:left; margin-right: 5px">
-    <input type="text" id="activeJobId" placeholder="Active job id" style="padding: 5px; height: 32px; border-radius: 4px; border: 1px solid #ccc;">
-    <button id="reconnectBtn" onclick="reconnectBtnClick()" class="dropbtn">Reconnect</button>
-</div>
-<br><br><br><br>
+
 <div id="report" style="word-wrap: anywhere"></div>
 <br>
 <div id="testreport"></div>

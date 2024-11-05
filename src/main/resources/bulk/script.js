@@ -106,7 +106,7 @@ let selectedForBulkTable;
 function tableSelect(dataset, table) {
     document.getElementById("tableDropdownBtn").innerHTML = table;
     document.getElementById("bulkStartBtn").classList.toggle("show")
-    selectedForBulkDataset = table;
+    selectedForBulkDataset = dataset;
     selectedForBulkTable = table;
     populateSchemaMapAction(dataset, table)
 }
@@ -118,8 +118,8 @@ selectedForBulkDataset = '';
 selectedForBulkTable = '';
 
 function bulkStartBtnClick() {
-    alert(`Will do batch on ${selectedForBulkDataset} ${selectedForBulkTable}`);
-    const response = fetch('/internal/performBulk?dataset='+dataset+'&table='+table, {
+    const userConfirmed = confirm(`Will do batch on ${selectedForBulkDataset} ${selectedForBulkTable}`);
+    const response = fetch('/internal/performBulk?dataset='+selectedForBulkDataset+'&table='+selectedForBulkTable, {
         method: 'GET',
         headers: {
             'Content-Type': 'text/html'
@@ -127,7 +127,7 @@ function bulkStartBtnClick() {
     });
 
     var t = response.text()
-    alert(t)
+    alert(t + " userconfirmed" + userConfirmed)
 }
 
 // Close the dropdown if the user clicks outside of it
