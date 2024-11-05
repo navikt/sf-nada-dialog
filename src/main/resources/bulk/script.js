@@ -36,8 +36,9 @@ function performBulk() {
             console.log('performBulk stringify:', JSON.stringify(data));
             // Check the state of the bulk job every 3 seconds
             if (data.state && data.state === 'JobComplete') {
-                statusElement.innerHTML = 'Job Complete: ' + JSON.stringify(data);
+                document.getElementById('status').innerHTML = 'Job Complete: ' + JSON.stringify(data);
             } else {
+                document.getElementById('status').innerHTML = JSON.stringify(data);
                 setTimeout(() => performBulk(), 3000); // Retry after 3 seconds
             }
         })
