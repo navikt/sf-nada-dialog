@@ -38,7 +38,7 @@ function performBulk() {
             if (data.state && data.state === 'JobComplete') {
                 showCompletionMessage(data)
             } else {
-                document.getElementById('status').innerHTML = 'Status: '+ data.state + ', records processed ' + data.numberRecordsProcessed;
+                document.getElementById('status').innerHTML = 'Status: '+ data.state + ', records processed ' + data.numberRecordsProcessed + ', job id:' + data.id;
                 setTimeout(() => performBulk(), 3000); // Retry after 3 seconds
             }
         })
@@ -175,7 +175,7 @@ async function bulkStartBtnClick() {
         alert(t)
         checkActiveId()
     }
-}q
+}
 
 // Close the dropdown if the user clicks outside of it
 window.onclick = function(event) {
@@ -221,7 +221,7 @@ function hideSelectElements() {
 
 function showCompletionMessage(data) {
     // Display completion message with records processed
-    document.getElementById('status').innerHTML = 'Job Complete, records processed: ' + data.numberRecordsProcessed;
+    document.getElementById('status').innerHTML = 'Job Complete, records processed: ' + data.numberRecordsProcessed + ', job id:' + data.id
 
     // Create the "Transfer data" button
     const transferButton = document.createElement('button');
