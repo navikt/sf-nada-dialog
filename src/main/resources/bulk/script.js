@@ -27,6 +27,7 @@ function datasetSelect(name) {
     document.getElementById("datasetDropdownBtn").innerHTML = name;
     document.getElementById("tableDropdownBtn").innerHTML = "Table"
     document.getElementById("report").innerHTML = ""
+    document.getElementById("bulkStartBtn").classList.remove("show")
 
     populateTableAction(name)
 }
@@ -105,7 +106,7 @@ let selectedForBulkTable;
 
 function tableSelect(dataset, table) {
     document.getElementById("tableDropdownBtn").innerHTML = table;
-    document.getElementById("bulkStartBtn").classList.toggle("show")
+    document.getElementById("bulkStartBtn").classList.add("show")
     selectedForBulkDataset = dataset;
     selectedForBulkTable = table;
     populateSchemaMapAction(dataset, table)
