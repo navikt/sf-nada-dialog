@@ -16,6 +16,7 @@ import no.nav.sf.nada.Metrics
 import no.nav.sf.nada.Metrics.cRegistry
 import no.nav.sf.nada.addYesterdayRestriction
 import no.nav.sf.nada.bulk.BulkOperation
+import no.nav.sf.nada.doSFBulkJobResultQuery
 import no.nav.sf.nada.doSFBulkJobStatusQuery
 import no.nav.sf.nada.doSFBulkStartQuery
 import no.nav.sf.nada.doSFQuery
@@ -175,6 +176,9 @@ fun naisAPI(): HttpHandler = routes(
     },
     "/internal/activeId" bind Method.GET to {
         Response(Status.OK).body(if (BulkOperation.operationIsActive) BulkOperation.jobId else "")
+    },
+    "/internal/results" bind Method.GET to {
+        Response(Status.OK).body(doSFBulkJobResultQuery(BulkOperation.jobId).bodyString())
     }
 )
 

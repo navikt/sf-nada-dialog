@@ -237,7 +237,19 @@ function showCompletionMessage(data) {
 }
 
 function startBulkTransfer(numberRecords) {
-    // Placeholder function for the bulk transfer logic
-    alert(`Starting bulk transfer of ${numberRecords} records...`);
     // Implement your bulk transfer logic here
+    document.getElementById('status').innerHTML = `Triggered data transfer of ${numberRecords} records`
+    fetchResults()
+}
+
+function fetchResults() {
+    fetch('/internal/results')
+        .then(response => response.json())
+        .then(data => {
+            // Display the response in the status element
+            document.getElementById('status').innerHTML = 'Results: ' + JSON.stringify(data);
+        })
+        .catch(error => {
+            console.error('Error performing bulk action:', error);
+        });
 }

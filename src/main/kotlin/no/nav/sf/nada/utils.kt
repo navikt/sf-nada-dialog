@@ -135,6 +135,15 @@ fun doSFBulkJobStatusQuery(jobId: String): Response {
     return response
 }
 
+fun doSFBulkJobResultQuery(jobId: String): Response {
+    // GET /services/data/v57.0/jobs/query/<jobID>/results
+    val request = Request(Method.GET, "${AccessTokenHandler.instanceUrl}/services/data/v57.0/jobs/query/$jobId/results")
+        .header("Authorization", "Bearer ${AccessTokenHandler.accessToken}")
+        .header("Content-Type", "application/json;charset=UTF-8")
+    val response = Bootstrap.client.value(request)
+    return response
+}
+
 fun String.addDateRestriction(localDate: LocalDate): String {
     val connector = if (this.contains("WHERE")) "+AND" else "+WHERE"
     return this + "$connector+LastModifiedDate>=TODAY+AND+LastModifiedDate<=TOMORROW"
