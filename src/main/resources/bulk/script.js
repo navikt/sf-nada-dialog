@@ -15,6 +15,8 @@ function checkActiveId() {
             if (data.trim()) {  // If there's a non-empty ID in the response
                 const activeId = data.trim(); // Extract the ID from the response
                 statusElement.innerHTML = 'Active ID found: ' + activeId;
+
+                hideSelectElements()
                 performBulk();
             } else {
                 statusElement.innerHTML = 'No active ID found';
@@ -173,8 +175,9 @@ async function bulkStartBtnClick() {
 
         const t = await response.text()
         alert(t)
+        checkActiveId()
     }
-}
+}q
 
 // Close the dropdown if the user clicks outside of it
 window.onclick = function(event) {
@@ -203,8 +206,17 @@ async function reconnectBtnClick() {
 
         const t = await response.text()
         alert(t)
+        checkActiveId()
         // Add logic here to handle the reconnect action based on jobId
     } else {
         alert('Please enter a job ID to reconnect.');
     }
+}
+
+function hideSelectElements() {
+    // Select elements by class name and hide them
+    const elementsToHide = document.querySelectorAll('.jobIdHolder, .datasetDropdownHolder, .tableDropdownHolder, .bulkStartHolder');
+    elementsToHide.forEach(element => {
+        element.style.display = 'none';
+    });
 }
