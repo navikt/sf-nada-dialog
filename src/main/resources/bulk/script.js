@@ -15,7 +15,7 @@ function checkActiveId() {
             if (data.trim()) {  // If there's a non-empty ID in the response
                 const activeId = data.trim(); // Extract the ID from the response
                 statusElement.innerHTML = 'Active ID found: ' + activeId;
-                performBulk(activeId);
+                performBulk();
             } else {
                 statusElement.innerHTML = 'No active ID found';
             }
@@ -25,18 +25,20 @@ function checkActiveId() {
         });
 }
 
-function performBulk(activeId) {
-    fetch('/internal/performBulk?id=' + activeId)
+function performBulk() {
+    fetch('/internal/performBulk')
         .then(response => response.json())
         .then(data => {
             // Display the response in the status element
             statusElement.innerHTML = 'Performing bulk action: ' + JSON.stringify(data);
 
+            console.log('performBulk response:', data);
+            console.log('performBulk stringify:', JSON.stringify(data);
             // Check the state of the bulk job every 3 seconds
             if (data.state && data.state === 'JobComplete') {
                 statusElement.innerHTML = 'Job Complete: ' + JSON.stringify(data);
             } else {
-                setTimeout(() => performBulk(activeId), 3000); // Retry after 3 seconds
+                setTimeout(() => performBulk(), 3000); // Retry after 3 seconds
             }
         })
         .catch(error => {
