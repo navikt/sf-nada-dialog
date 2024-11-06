@@ -115,7 +115,7 @@ fun doSFBulkStartQuery(dataset: String, table: String): Response {
             """{
                 "operation": "query",
                 "query": "$query",
-                "contentType": "JSON"
+                "contentType": "CSV"
                   }""".trim()
         )
 
