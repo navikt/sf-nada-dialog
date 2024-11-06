@@ -6,6 +6,8 @@ import no.nav.sf.nada.Bootstrap
 import no.nav.sf.nada.doSFBulkJobResultQuery
 import no.nav.sf.nada.parseCSVToJsonArray
 import no.nav.sf.nada.remapAndSendRecords
+import java.lang.Exception
+import java.lang.RuntimeException
 
 object BulkOperation {
     private val log = KotlinLogging.logger { }
@@ -38,8 +40,12 @@ object BulkOperation {
         do {
             val response = doSFBulkJobResultQuery(jobId, locator)
             val array = parseCSVToJsonArray(response.bodyString())
-            remapAndSendRecords(array, tableId, fieldDef)
-
+            try {
+                remapAndSendRecords(array, tableId, fieldDef)
+            } catch (e: Exception) {
+                dataTransferReport += "\nFail in batch operation - ${e.message}"
+                throw RuntimeException("Fail in batch operation - ${e.message}")
+            }
             locator = response.header("Sforce-Locator")
             val reportRow = "Processed ${array.size()} records, next locator: $locator"
             log.info { reportRow }
