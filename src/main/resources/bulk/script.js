@@ -172,7 +172,7 @@ async function bulkStartBtnClick() {
         });
 
         const t = await response.text()
-        alert(t)
+        //alert(t)
         checkActiveId()
     }
 }
@@ -194,7 +194,7 @@ window.onclick = function(event) {
 async function reconnectBtnClick() {
     const jobId = document.getElementById('activeJobId').value;
     if (jobId) {
-        alert(`Reconnecting to job ID: ${jobId}`);
+        //alert(`Reconnecting to job ID: ${jobId}`);
         const response = await fetch('/internal/reconnect?id=' + jobId, {
             method: 'GET',
             headers: {
@@ -203,7 +203,7 @@ async function reconnectBtnClick() {
         });
 
         const t = await response.text()
-        alert(t)
+        //alert(t)
         checkActiveId()
         // Add logic here to handle the reconnect action based on jobId
     } else {
@@ -225,7 +225,7 @@ function showCompletionMessage(data) {
 
     // Add event listener for the button
     document.getElementById('startTransfer').addEventListener('click', function() {
-        const confirmTransfer = confirm(`Would you like to start bulk transfer of ${data.numberRecordsProcessed} records?`);
+        const confirmTransfer = confirm(`This will start bulk transfer of ${data.numberRecordsProcessed} records?`);
         if (confirmTransfer) {
             // Call the function to start bulk transfer here
             startBulkTransfer(data.numberRecordsProcessed);
@@ -237,13 +237,12 @@ function showCompletionMessage(data) {
 }
 
 function startBulkTransfer(numberRecords) {
-    // Implement your bulk transfer logic here
     document.getElementById('status').innerHTML = `Triggered data transfer of ${numberRecords} records`
-    fetchResults()
+    fetchTransferResults()
 }
 
-function fetchResults() {
-    fetch('/internal/results')
+function fetchTransferResults() {
+    fetch('/internal/transfer')
         .then(response => response.text())
         .then(data => {
             // Display the response in the status element

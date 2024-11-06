@@ -4,6 +4,8 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import io.prometheus.client.Gauge
 import io.prometheus.client.exporter.common.TextFormat
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import no.nav.sf.nada.Bootstrap
 import no.nav.sf.nada.Bootstrap.SF_QUERY_BASE
@@ -16,12 +18,10 @@ import no.nav.sf.nada.Metrics
 import no.nav.sf.nada.Metrics.cRegistry
 import no.nav.sf.nada.addYesterdayRestriction
 import no.nav.sf.nada.bulk.BulkOperation
-import no.nav.sf.nada.doSFBulkJobResultQuery
 import no.nav.sf.nada.doSFBulkJobStatusQuery
 import no.nav.sf.nada.doSFBulkStartQuery
 import no.nav.sf.nada.doSFQuery
 import no.nav.sf.nada.gson
-import no.nav.sf.nada.parseCSVToJsonArray
 import no.nav.sf.nada.token.AccessTokenHandler
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -153,7 +153,6 @@ fun naisAPI(): HttpHandler = routes(
                 // Response(Status.OK).body(bulkResponse.bodyString())
             } catch (e: Exception) {
                 log.error { e.stackTraceToString() }
-                Response(Status.OK).body("Something went wrong with bulk start, response from SF ${bulkResponse.status.code} ${bulkResponse.bodyString()}")
             }
         }
         val bulkJobStatusResponse = doSFBulkJobStatusQuery(BulkOperation.jobId)
@@ -161,9 +160,12 @@ fun naisAPI(): HttpHandler = routes(
             val responseObj = JsonParser.parseString(bulkJobStatusResponse.bodyString()) as JsonObject
             BulkOperation.jobId = responseObj["id"].asString
             BulkOperation.operationIsActive = true
+            if (responseObj["state"].asString == "JobComplete") {
+                File("/tmp/jobRegisteredAsDoneByPerformBulk").writeText("yes")
+                BulkOperation.jobComplete = true
+            }
         } catch (e: Exception) {
             log.error { e.stackTraceToString() }
-            Response(Status.OK).body("Something went wrong with check, response from SF ${bulkJobStatusResponse.status.code} ${bulkJobStatusResponse.bodyString()}")
         }
         Response(Status.OK).body(bulkJobStatusResponse.bodyString())
     },
@@ -177,22 +179,31 @@ fun naisAPI(): HttpHandler = routes(
     "/internal/activeId" bind Method.GET to {
         Response(Status.OK).body(if (BulkOperation.operationIsActive) BulkOperation.jobId else "")
     },
-    "/internal/results" bind Method.GET to {
-        var response = doSFBulkJobResultQuery(BulkOperation.jobId)
-
-        val array = parseCSVToJsonArray(response.bodyString())
-
-        var reportSize = "" + array.size() + "-"
-
-        for (i in 1..5) {
-            val locatorHeader = response.header("Sforce-Locator")
-            if (locatorHeader != null) {
-                response = doSFBulkJobResultQuery(BulkOperation.jobId, locatorHeader)
-                val nextArray = parseCSVToJsonArray(response.bodyString())
-                reportSize += "" + nextArray.size() + "-"
+    "/internal/transfer" bind Method.GET to {
+        if (!BulkOperation.operationIsActive) {
+            Response(Status.PRECONDITION_FAILED).body("No batch operation initiated")
+        } else if (!BulkOperation.jobComplete) {
+            // Check if job is done since last check
+            val bulkJobStatusResponse = doSFBulkJobStatusQuery(BulkOperation.jobId)
+            val responseObj = JsonParser.parseString(bulkJobStatusResponse.bodyString()) as JsonObject
+            if (responseObj["state"].asString == "JobComplete") {
+                BulkOperation.jobComplete = true
             }
         }
-        Response(Status.OK).body("Volume report $reportSize")
+        if (!BulkOperation.jobComplete) {
+            Response(Status.PRECONDITION_FAILED).body("Batch job is not finished - cannot do data transfer yet")
+            // } else if (BulkOperation.dataTransferIsActive) {
+            //    Response(Status.CONFLICT).body("Already an active data transfer - not allowed to do more in parallel")
+        } else if (BulkOperation.dataTransferIsActive) {
+            Response(Status.OK).body(BulkOperation.dataTransferReport)
+        } else {
+            BulkOperation.dataTransferIsActive = true
+            GlobalScope.launch {
+                BulkOperation.runTransferJob()
+            }
+            BulkOperation.dataTransferReport = "Job started${if (BulkOperation.dataset.isNotEmpty()) " for ${BulkOperation.dataset}, ${BulkOperation.table}" else ""}...${if (!postToBigQuery) " (Will not actually post due to postToBigQuery flag false)" else ""}"
+            Response(Status.OK).body(BulkOperation.dataTransferReport)
+        }
     }
 )
 
