@@ -18,11 +18,6 @@ private val log = KotlinLogging.logger { }
 fun main() = Bootstrap.start()
 
 object Bootstrap {
-    val SFClientID = env(secret_SFClientID)
-
-    val SFUsername = env(secret_SFUsername)
-
-    const val EV_httpsProxy = "HTTPS_PROXY"
 
     val projectId = env(env_GCP_TEAM_PROJECT_ID)
 
@@ -44,7 +39,7 @@ object Bootstrap {
 
     val bigQueryService =
         BigQueryOptions.newBuilder()
-            .setProjectId(Bootstrap.projectId)
+            .setProjectId(projectId)
             .build().service
 
     fun start() {
@@ -98,11 +93,11 @@ object Bootstrap {
         }
     }
 
-    fun LocalTime.inResetRange(): Boolean {
+    private fun LocalTime.inResetRange(): Boolean {
         return this.isAfter(resetRangeStart) && this.isBefore(resetRangeStop)
     }
 
-    fun LocalTime.inActiveRange(): Boolean {
+    private fun LocalTime.inActiveRange(): Boolean {
         return this.isAfter(resetRangeStop)
     }
 }

@@ -1,6 +1,7 @@
 package no.nav.sf.nada
 
 import com.google.gson.Gson
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import kotlinx.coroutines.delay
@@ -10,14 +11,16 @@ import mu.KotlinLogging
 import no.nav.kafka.dialog.PrestopHook
 import no.nav.kafka.dialog.ShutdownHook
 import no.nav.sf.nada.token.AccessTokenHandler
+import org.apache.commons.csv.CSVFormat
+import org.apache.commons.csv.CSVParser
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.urlEncoded
 import java.io.File
+import java.io.StringReader
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import kotlin.streams.toList
 
 private val log = KotlinLogging.logger { }
 
@@ -156,3 +159,33 @@ fun String.addDateRestriction(localDate: LocalDate): String {
 }
 
 fun String.addYesterdayRestriction(): String = this.addDateRestriction(LocalDate.now().minusDays(1))
+
+fun parseCSVToJsonArray(csvData: String): JsonArray {
+    val jsonArray = JsonArray()
+
+    // Parse the CSV data with the new approach for headers
+    val reader = StringReader(csvData)
+    val csvParser = CSVParser(
+        reader,
+        CSVFormat.DEFAULT.builder().setSkipHeaderRecord(true).setHeader().build()
+    )
+
+    // Iterate through the records (skipping the header row)
+    for (csvRecord in csvParser) {
+        val jsonObject = JsonObject()
+
+        // For each column in the record, add the key-value pair to the JsonObject
+        csvRecord.toMap().forEach { (key, value) ->
+            jsonObject.addProperty(key, value)
+        }
+
+        // Add the JsonObject to the JsonArray
+        jsonArray.add(jsonObject)
+    }
+
+    // Close the reader and parser
+    csvParser.close()
+    reader.close()
+
+    return jsonArray
+}

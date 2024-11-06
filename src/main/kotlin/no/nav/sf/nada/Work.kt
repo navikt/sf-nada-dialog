@@ -111,6 +111,7 @@ fun remapAndSendRecords(records: JsonArray, tableId: TableId, fieldDefMap: Mutab
             log.info { "Rows (${records.count()}) successfully inserted into dataset ${tableId.dataset}, table ${tableId.table}" }
         }
     } else {
+        File("/tmp/wouldHaveSent").writeText(insertAllRequest.toString())
         log.info { "Rows (${records.count()}) ready to post but will skip due to postToBigQuery flag set to false" }
     }
 }

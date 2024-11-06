@@ -21,6 +21,7 @@ import no.nav.sf.nada.doSFBulkJobStatusQuery
 import no.nav.sf.nada.doSFBulkStartQuery
 import no.nav.sf.nada.doSFQuery
 import no.nav.sf.nada.gson
+import no.nav.sf.nada.parseCSVToJsonArray
 import no.nav.sf.nada.token.AccessTokenHandler
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
@@ -143,11 +144,8 @@ fun naisAPI(): HttpHandler = routes(
             val table = it.query("table")
             BulkOperation.dataset = dataset!!
             BulkOperation.table = table!!
-
             val bulkResponse = doSFBulkStartQuery(BulkOperation.dataset, BulkOperation.table)
-
             try {
-
                 File("/tmp/bulkstartQueryResponse").writeText(bulkResponse.toMessage())
                 val responseObj = JsonParser.parseString(bulkResponse.bodyString()) as JsonObject
                 BulkOperation.jobId = responseObj["id"].asString
@@ -180,7 +178,11 @@ fun naisAPI(): HttpHandler = routes(
         Response(Status.OK).body(if (BulkOperation.operationIsActive) BulkOperation.jobId else "")
     },
     "/internal/results" bind Method.GET to {
-        Response(Status.OK).body(doSFBulkJobResultQuery(BulkOperation.jobId).bodyString())
+        val responseBody = doSFBulkJobResultQuery(BulkOperation.jobId).bodyString()
+
+        val array = parseCSVToJsonArray(responseBody)
+        File("/tmp/resultsAsJsonArray").writeText("${array.size()} size of array\n${gson.toJson(array)}")
+        Response(Status.OK).body("${responseBody.length} chars in response")
     }
 )
 
