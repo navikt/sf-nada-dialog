@@ -147,6 +147,8 @@ fun naisAPI(): HttpHandler = routes(
             val bulkResponse = doSFBulkStartQuery(BulkOperation.dataset, BulkOperation.table)
 
             try {
+
+                File("/tmp/bulkstartQueryResponse").writeText(bulkResponse.toMessage())
                 val responseObj = JsonParser.parseString(bulkResponse.bodyString()) as JsonObject
                 BulkOperation.jobId = responseObj["id"].asString
                 BulkOperation.operationIsActive = true
