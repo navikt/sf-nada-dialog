@@ -178,7 +178,7 @@ fun naisAPI(): HttpHandler = routes(
         Response(Status.OK).body(if (BulkOperation.operationIsActive) BulkOperation.jobId else "")
     },
     "/internal/results" bind Method.GET to {
-        val response = doSFBulkJobResultQuery(BulkOperation.jobId)
+        var response = doSFBulkJobResultQuery(BulkOperation.jobId)
 
         val array = parseCSVToJsonArray(response.bodyString())
 
@@ -187,8 +187,8 @@ fun naisAPI(): HttpHandler = routes(
         for (i in 1..5) {
             val locatorHeader = response.header("Sforce-Locator")
             if (locatorHeader != null) {
-                val nextResponse = doSFBulkJobResultQuery(BulkOperation.jobId, locatorHeader)
-                val nextArray = parseCSVToJsonArray(nextResponse.bodyString())
+                response = doSFBulkJobResultQuery(BulkOperation.jobId, locatorHeader)
+                val nextArray = parseCSVToJsonArray(response.bodyString())
                 reportSize += "" + nextArray.size() + "-"
             }
         }
