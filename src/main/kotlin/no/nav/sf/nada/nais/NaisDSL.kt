@@ -178,11 +178,21 @@ fun naisAPI(): HttpHandler = routes(
         Response(Status.OK).body(if (BulkOperation.operationIsActive) BulkOperation.jobId else "")
     },
     "/internal/results" bind Method.GET to {
-        val responseBody = doSFBulkJobResultQuery(BulkOperation.jobId).bodyString()
+        val response = doSFBulkJobResultQuery(BulkOperation.jobId)
 
-        val array = parseCSVToJsonArray(responseBody)
-        File("/tmp/resultsAsJsonArray").writeText("${array.size()} size of array\n${gson.toJson(array)}")
-        Response(Status.OK).body("${responseBody.length} chars in response")
+        val array = parseCSVToJsonArray(response.bodyString())
+
+        var reportSize = "" + array.size() + "-"
+
+        for (i in 1..5) {
+            val locatorHeader = response.header("Sforce-Locator")
+            if (locatorHeader != null) {
+                val nextResponse = doSFBulkJobResultQuery(BulkOperation.jobId, locatorHeader)
+                val nextArray = parseCSVToJsonArray(nextResponse.bodyString())
+                reportSize += "" + nextArray.size() + "-"
+            }
+        }
+        Response(Status.OK).body("Volume report $reportSize")
     }
 )
 
