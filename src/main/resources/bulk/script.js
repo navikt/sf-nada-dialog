@@ -244,10 +244,10 @@ function startBulkTransfer(numberRecords) {
 
 function fetchResults() {
     fetch('/internal/results')
-        .then(response => response.json())
+        .then(response => response.text())
         .then(data => {
             // Display the response in the status element
-            document.getElementById('status').innerHTML = 'Results: ' + JSON.stringify(data);
+            document.getElementById('status').innerHTML = 'Results: ' + data;
         })
         .catch(error => {
             console.error('Error performing bulk action:', error);
