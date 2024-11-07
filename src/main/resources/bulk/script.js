@@ -211,7 +211,7 @@ async function reconnectBtnClick() {
         // Add logic here to handle the reconnect action based on jobId
     } else {
         if (!jobId) alert('Please enter a job ID to reconnect.');
-        if (lastSelectedTable === '') alert('Please select table to reconnect.');
+        if (selectedForBulkTable === '') alert('Please select table to reconnect.');
     }
 }
 
