@@ -1,5 +1,11 @@
 
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
+import no.nav.sf.nada.missingFieldNames
+import no.nav.sf.nada.missingFieldWarning
 import no.nav.sf.nada.parseMapDef
+import no.nav.sf.nada.toRowMap
+import org.junit.jupiter.api.Test
 
 const val MAPDEF_FILE_DEV = "/mapdef/dev.json"
 const val MAPDEF_FILE_PROD = "/mapdef/prod.json"
@@ -8,9 +14,19 @@ const val RECORD_KUNNSKAP_FILE = "/record_kunnskapsartikler.json"
 const val RECORD_CHAT_FILE = "/record_chat_mock.json"
 const val RECORD_AGREEMENT_FILE = "/record_agreement_with_nulls.json"
 
+const val RECORD_MOETER_MISSING = "/record_moeter_missing.json"
+
 public class RecordTranslateTest {
     val mapDefDev = parseMapDef(MAPDEF_FILE_DEV)
     val mapDefProd = parseMapDef(MAPDEF_FILE_PROD)
+    @Test
+    fun test_translation_of_object_missing_element() {
+        val recordObj = JsonParser.parseString(RecordTranslateTest::class.java.getResource(RECORD_MOETER_MISSING).readText()) as JsonObject
+        val fieldDefMap = mapDefProd["arbeidsgiver_aktivitet"]!!["arbeidsgiver_moeter"]!!.fieldDefMap
+
+        recordObj.toRowMap(fieldDefMap)
+        println( "Expected field $missingFieldNames missing in record, total sum ($missingFieldWarning)" )
+    }
 
     // TODO Once we have a stable model to test against, we can do a variant of the testing below to ensure mapdef file is sound etc.
     /*

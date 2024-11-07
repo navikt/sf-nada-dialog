@@ -7,6 +7,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonNull
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import com.google.gson.JsonPrimitive
 import mu.KotlinLogging
 import no.nav.sf.nada.Bootstrap.SF_QUERY_BASE
 import no.nav.sf.nada.Bootstrap.bigQueryService
@@ -81,9 +82,19 @@ fun Response.parsedRecordsCount(): Int {
     return obj["totalSize"].asInt
 }
 
+var missingFieldWarning = 0
+
+val missingFieldNames: MutableSet<String> = mutableSetOf()
+
 fun JsonObject.findBottomElement(defKey: String): JsonElement {
     val subKeys = defKey.split(".")
     val depth = subKeys.size
+    if (!this.has(subKeys[0])) {
+        // log.warn { "Expected field $defKey missing in record" }
+        missingFieldWarning++
+        missingFieldNames.add(subKeys[0])
+        return JsonNull.INSTANCE
+    }
     if (depth == 1) return this[defKey]
     var element = this[subKeys[0]]
     for (i in 1 until subKeys.size) {
@@ -100,10 +111,14 @@ fun remapAndSendRecords(records: JsonArray, tableId: TableId, fieldDefMap: Mutab
     records.forEach { record ->
         builder.addRow((record as JsonObject).toRowMap(fieldDefMap))
     }
+    if (missingFieldWarning > 0) {
+        log.warn { "Expected field $missingFieldNames missing in record, total sum ($missingFieldWarning)" }
+    }
     val insertAllRequest = builder.build()
     records.last().let { File("/tmp/latestRecord_${tableId.table}").writeText("$it") }
     insertAllRequest.rows.last().let { File("/tmp/latestRow_${tableId.table}").writeText("$it") }
-    insertAllRequest.rows.map { "$it" }.joinToString(",\n").let { File("/tmp/allRows_${tableId.table}").writeText("$it") }
+    insertAllRequest.rows.map { "$it" }.joinToString(",\n")
+        .let { File("/tmp/allRows_${tableId.table}").writeText("$it") }
     if (postToBigQuery) {
         val response = bigQueryService.insertAll(insertAllRequest)
         if (response.hasErrors()) {
@@ -125,9 +140,11 @@ fun JsonObject.toRowMap(fieldDefMap: MutableMap<String, FieldDef>): MutableMap<S
     val rowMap: MutableMap<String, Any?> = mutableMapOf()
     fieldDefMap.forEach { defEntry ->
         val element = this.findBottomElement(defEntry.key)
-        if (!postToBigQuery) {
-            File("/tmp/translateProcess").appendText("${element.asString} -> ${defEntry.value.name} (${defEntry.value.type})\n")
-        }
+        // if (!postToBigQuery) {
+        val elementValueOrNull = if (element is JsonNull) JsonPrimitive("null") else element
+        // log.info { "${elementValueOrNull.asString} -> ${defEntry.value.name} (${defEntry.value.type})\n" }
+        File("/tmp/translateProcess").appendText("${elementValueOrNull.asString} -> ${defEntry.value.name} (${defEntry.value.type})\n")
+        // }
         rowMap[defEntry.value.name] = if (element is JsonNull) {
             null
         } else {
