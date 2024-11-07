@@ -60,11 +60,14 @@ object BulkOperation {
             processedRecords += array.size()
             val reportRow = "Processed ${array.size()} records, next locator: $locator"
             log.info { reportRow }
+            dataTransferReport += "\n$reportRow"
             currentResultLocator = locator
             if (locator == null) {
-                dataTransferReport += "\n$reportRow\nDone ($processedRecords records processed)"
+                dataTransferReport += "\nDone ($processedRecords records processed)"
+                log.info { "Done ($processedRecords records processed)" }
                 if (missingFieldWarning > 0) {
                     dataTransferReport += "\nWarning: Expected fields $missingFieldNames missing in record, total sum ($missingFieldWarning)"
+                    log.info { "Warning: Expected fields $missingFieldNames missing in record, total sum ($missingFieldWarning)" }
                 }
                 transferDone = true
             }

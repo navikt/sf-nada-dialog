@@ -160,6 +160,7 @@ fun String.addDateRestriction(localDate: LocalDate): String {
 fun String.addYesterdayRestriction(): String = this.addDateRestriction(LocalDate.now().minusDays(1))
 
 fun parseCSVToJsonArray(csvData: String): JsonArray {
+    File("/tmp/csvData").writeText(csvData)
     val jsonArray = JsonArray()
 
     // Parse the CSV data with the new approach for headers
