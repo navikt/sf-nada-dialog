@@ -8,7 +8,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import no.nav.kafka.dialog.PrestopHook
 import no.nav.kafka.dialog.ShutdownHook
 import no.nav.sf.nada.token.AccessTokenHandler
 import org.apache.commons.csv.CSVFormat
@@ -43,7 +42,7 @@ fun conditionalWait(ms: Long) =
 
         tailrec suspend fun loop(): Unit = when {
             cr.isCompleted -> Unit
-            ShutdownHook.isActive() || PrestopHook.isActive() -> cr.cancel()
+            ShutdownHook.isActive() -> cr.cancel()
             else -> {
                 delay(250L)
                 loop()
@@ -54,19 +53,10 @@ fun conditionalWait(ms: Long) =
         cr.join()
     }
 
-fun ByteArray.encodeB64(): String = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(this)
-fun String.encodeB64UrlSafe(): String = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(this.toByteArray())
-fun String.encodeB64(): String = org.apache.commons.codec.binary.Base64.encodeBase64String(this.toByteArray())
-fun String.decodeB64(): ByteArray = org.apache.commons.codec.binary.Base64.decodeBase64(this)
-
 /**
  * Shortcuts for fetching environment variables
  */
 fun env(env: String): String { return System.getenv(env) }
-
-fun envAsLong(env: String): Long { return System.getenv(env).toLong() }
-
-fun envAsInt(env: String): Int { return System.getenv(env).toInt() }
 
 fun envAsBoolean(env: String): Boolean { return System.getenv(env).trim().toBoolean() }
 

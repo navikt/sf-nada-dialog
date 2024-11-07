@@ -88,7 +88,6 @@ fun JsonObject.findBottomElement(defKey: String): JsonElement {
     val subKeys = defKey.split(".")
     val depth = subKeys.size
     if (!this.has(subKeys[0])) {
-        // log.warn { "Expected field $defKey missing in record" }
         missingFieldWarning++
         missingFieldNames.add(subKeys[0])
         return JsonNull.INSTANCE

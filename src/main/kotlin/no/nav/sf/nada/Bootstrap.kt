@@ -2,9 +2,8 @@ package no.nav.sf.nada
 
 import com.google.cloud.bigquery.BigQueryOptions
 import mu.KotlinLogging
-import no.nav.kafka.dialog.PrestopHook
 import no.nav.kafka.dialog.ShutdownHook
-import no.nav.kafka.dialog.enableNAISAPI
+import no.nav.kafka.dialog.apiServer
 import org.http4k.client.ApacheClient
 import java.time.LocalDate
 import java.time.LocalTime
@@ -45,11 +44,11 @@ object Bootstrap {
     fun start() {
         log.info { "Starting app with settings: projectId $projectId, postTobigQuery $postToBigQuery, runSessionOnStartup $runSessionOnStartup, fetchAllRecords $fetchAllRecords, excludeTables $excludeTables" }
 
-        enableNAISAPI {
-            log.info { "1 minutes graceful start - establishing connections" }
-            Thread.sleep(60000)
+        apiServer().start()
+        log.info { "1 minutes graceful start - establishing connections" }
+        Thread.sleep(60000)
 
-            // One offs (remember to remove after one run):
+        // One offs (remember to remove after one run):
             /*
             oneOff("2024-05-23")
             oneOff("2024-05-30")
@@ -58,10 +57,10 @@ object Bootstrap {
             oneOff("2024-06-10")
             oneOff("2024-06-13")
              */
-            //
+        //
 
-            loop()
-        }
+        loop()
+
         log.info { "App Finished!" }
     }
 
@@ -69,7 +68,7 @@ object Bootstrap {
 
     private tailrec fun loop() {
 
-        val stop = ShutdownHook.isActive() || PrestopHook.isActive()
+        val stop = ShutdownHook.isActive()
         when {
             stop -> Unit
             !stop -> {
