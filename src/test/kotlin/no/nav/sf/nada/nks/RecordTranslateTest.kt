@@ -1,6 +1,8 @@
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import no.nav.sf.nada.bulk.BulkOperation.missingFieldNames
+import no.nav.sf.nada.bulk.BulkOperation.missingFieldWarning
 import no.nav.sf.nada.parseMapDef
 import no.nav.sf.nada.toRowMap
 import org.junit.jupiter.api.Test
@@ -23,7 +25,7 @@ public class RecordTranslateTest {
         val fieldDefMap = mapDefProd["arbeidsgiver_aktivitet"]!!["arbeidsgiver_moeter"]!!.fieldDefMap
 
         recordObj.toRowMap(fieldDefMap)
-        // println("Expected field $missingFieldNames missing in record, total sum ($missingFieldWarning)")
+        println("Expected field $missingFieldNames missing in record, total sum ($missingFieldWarning)")
     }
 
     // TODO Once we have a stable model to test against, we can do a variant of the testing below to ensure mapdef file is sound etc.

@@ -35,6 +35,12 @@ object BulkOperation {
     @Volatile
     var transferDone: Boolean = false
 
+    var processedRecords = 0
+
+    var missingFieldWarning = 0
+
+    val missingFieldNames: MutableSet<String> = mutableSetOf()
+
     fun runTransferJob() {
         val fieldDef = Bootstrap.mapDef[dataset]!![table]!!.fieldDefMap
         val tableId = TableId.of(dataset, table)
@@ -50,9 +56,10 @@ object BulkOperation {
                 throw RuntimeException("Fail in batch operation - ${e.message}")
             }
             locator = response.header("Sforce-Locator")
+            processedRecords += array.size()
             val reportRow = "Processed ${array.size()} records, next locator: $locator"
             log.info { reportRow }
-            dataTransferReport += "\n$reportRow"
+            dataTransferReport += "\n$reportRow\nDone ($processedRecords records processed)"
             currentResultLocator = locator
             if (locator == null) transferDone = true
         } while (locator != null)

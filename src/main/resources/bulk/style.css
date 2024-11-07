@@ -46,3 +46,13 @@
 a:hover {background-color: #ddd}
 
 .show {display: block;}
+
+#status {
+    white-space: pre-wrap;
+    padding: 10px;           /* Adds padding around the text */
+    border: 1px solid #ccc;  /* Adds a light border */
+    border-radius: 5px;      /* Slightly rounds the corners */
+    background-color: #f9f9f9; /* Light background color for contrast */
+    font-family: Arial, sans-serif; /* Makes the font more readable */
+    line-height: 1.5;
+}

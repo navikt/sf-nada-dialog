@@ -16,6 +16,8 @@ import no.nav.sf.nada.Bootstrap.fetchAllRecords
 import no.nav.sf.nada.Bootstrap.hasPostedToday
 import no.nav.sf.nada.Bootstrap.mapDef
 import no.nav.sf.nada.Bootstrap.postToBigQuery
+import no.nav.sf.nada.bulk.BulkOperation.missingFieldNames
+import no.nav.sf.nada.bulk.BulkOperation.missingFieldWarning
 import no.nav.sf.nada.token.AccessTokenHandler
 import org.http4k.core.Response
 import java.io.File
@@ -81,10 +83,6 @@ fun Response.parsedRecordsCount(): Int {
     val obj = JsonParser.parseString(this.bodyString()) as JsonObject
     return obj["totalSize"].asInt
 }
-
-var missingFieldWarning = 0
-
-val missingFieldNames: MutableSet<String> = mutableSetOf()
 
 fun JsonObject.findBottomElement(defKey: String): JsonElement {
     val subKeys = defKey.split(".")
