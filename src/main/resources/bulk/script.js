@@ -39,7 +39,7 @@ function performBulk() {
                 showCompletionMessage(data)
             } else {
                 document.getElementById('status').innerHTML = 'Status: '+ data.state + ', records processed ' + data.numberRecordsProcessed + ', job id:' + data.id;
-                setTimeout(() => performBulk(), 3000); // Retry after 3 seconds
+                setTimeout(() => performBulk(), 1000); // Retry after 1 seconds
             }
         })
         .catch(error => {
@@ -193,9 +193,9 @@ window.onclick = function(event) {
 
 async function reconnectBtnClick() {
     const jobId = document.getElementById('activeJobId').value;
-    if (jobId) {
+    if (jobId && lastSelectedTable !== '') {
         //alert(`Reconnecting to job ID: ${jobId}`);
-        const response = await fetch('/internal/reconnect?id=' + jobId, {
+        const response = await fetch('/internal/reconnect?id=' + jobId + "&dataset=" + lastSelectedDataset + "&table=" + lastSelectedTable, {
             method: 'GET',
             headers: {
                 'Content-Type': 'text/html'
@@ -207,7 +207,8 @@ async function reconnectBtnClick() {
         checkActiveId()
         // Add logic here to handle the reconnect action based on jobId
     } else {
-        alert('Please enter a job ID to reconnect.');
+        if (!jobId) alert('Please enter a job ID to reconnect.');
+        if (lastSelectedTable === '') alert('Please select table to reconnect.');
     }
 }
 
@@ -243,10 +244,19 @@ function startBulkTransfer(numberRecords) {
 
 function fetchTransferResults() {
     fetch('/internal/transfer')
-        .then(response => response.text())
-        .then(data => {
-            // Display the response in the status element
-            document.getElementById('status').innerHTML = 'Results: ' + data;
+        .then(response => {
+            if (response.status === 202) {
+                return response.text().then(data => {
+                    document.getElementById('status').innerHTML = 'Results: ' + data;
+                    // Trigger the next call only if status is 202 Accepted
+                    setTimeout(fetchTransferResults, 1000);
+                });
+            } else {
+                return response.text().then(data => {
+                    // Display the final response in the status element
+                    document.getElementById('status').innerHTML = 'Results: ' + data;
+                });
+            }
         })
         .catch(error => {
             console.error('Error performing bulk action:', error);

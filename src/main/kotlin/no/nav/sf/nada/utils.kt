@@ -175,7 +175,7 @@ fun parseCSVToJsonArray(csvData: String): JsonArray {
 
         // For each column in the record, add the key-value pair to the JsonObject
         csvRecord.toMap().forEach { (key, value) ->
-            jsonObject.addProperty(key, value)
+            jsonObject.addProperty(key, if (value.isNullOrBlank()) null else value)
         }
 
         // Add the JsonObject to the JsonArray

@@ -24,13 +24,16 @@ object BulkOperation {
     @Volatile
     var jobComplete: Boolean = false
 
-    var currentResultLocator: String = ""
+    var currentResultLocator: String? = null
 
     @Volatile
     var dataTransferIsActive: Boolean = false
 
     @Volatile
     var dataTransferReport: String = ""
+
+    @Volatile
+    var transferDone: Boolean = false
 
     fun runTransferJob() {
         val fieldDef = Bootstrap.mapDef[dataset]!![table]!!.fieldDefMap
@@ -50,6 +53,8 @@ object BulkOperation {
             val reportRow = "Processed ${array.size()} records, next locator: $locator"
             log.info { reportRow }
             dataTransferReport += "\n$reportRow"
+            currentResultLocator = locator
+            if (locator == null) transferDone = true
         } while (locator != null)
     }
 }

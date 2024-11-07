@@ -171,14 +171,18 @@ fun naisAPI(): HttpHandler = routes(
     },
     "/internal/reconnect" bind Method.GET to {
         val id = it.query("id")
+        val dataset = it.query("dataset")
+        val table = it.query("table")
         // TODO Also need dataset and table provided
         BulkOperation.jobId = id!!
+        BulkOperation.dataset = dataset!!
+        BulkOperation.table = table!!
         BulkOperation.operationIsActive = true
         log.info { "Reconnecting gui to jobId $id" }
-        Response(Status.OK).body("Reconnected to jobId $id")
+        Response(Status.OK).body("Reconnected to jobId $id, dataset $dataset, table $table")
     },
     "/internal/activeId" bind Method.GET to {
-        Response(Status.OK).body(if (BulkOperation.operationIsActive) BulkOperation.jobId else "")
+        Response(Status.OK).body(if (BulkOperation.operationIsActive) "${BulkOperation.jobId} (${BulkOperation.dataset}, ${BulkOperation.table})" else "")
     },
     "/internal/transfer" bind Method.GET to {
         if (!BulkOperation.operationIsActive) {
@@ -195,15 +199,17 @@ fun naisAPI(): HttpHandler = routes(
             Response(Status.PRECONDITION_FAILED).body("Batch job is not finished - cannot do data transfer yet")
             // } else if (BulkOperation.dataTransferIsActive) {
             //    Response(Status.CONFLICT).body("Already an active data transfer - not allowed to do more in parallel")
-        } else if (BulkOperation.dataTransferIsActive) {
+        } else if (BulkOperation.transferDone) {
             Response(Status.OK).body(BulkOperation.dataTransferReport)
+        } else if (BulkOperation.dataTransferIsActive) {
+            Response(Status.ACCEPTED).body(BulkOperation.dataTransferReport)
         } else {
             BulkOperation.dataTransferIsActive = true
             GlobalScope.launch {
                 BulkOperation.runTransferJob()
             }
             BulkOperation.dataTransferReport = "Job started${if (BulkOperation.dataset.isNotEmpty()) " for ${BulkOperation.dataset}, ${BulkOperation.table}" else ""}...${if (!postToBigQuery) " (Will not actually post due to postToBigQuery flag false)" else ""}"
-            Response(Status.OK).body(BulkOperation.dataTransferReport)
+            Response(Status.ACCEPTED).body(BulkOperation.dataTransferReport)
         }
     }
 )

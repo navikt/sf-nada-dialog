@@ -75,6 +75,9 @@
         populateAction();
     };
 
+    let lastSelectedDataset = ''
+    let lastSelectedTable = ''
+
     const populateAction = async () => {
         const response = await fetch('/internal/datasets', {
             method: 'GET',
@@ -83,7 +86,6 @@
             }
         });
 
-        var r = '["nks_knowledge","nks_chat"]';
         var j = await response.json();
 
         let datasetDrop = document.getElementById("datasetDropdown");
@@ -99,6 +101,9 @@
         document.getElementById("datasetDropdownBtn").innerHTML = name;
         document.getElementById("tableDropdownBtn").innerHTML = "Table"
         document.getElementById("report").innerHTML = ""
+
+        lastSelectedDataset = name
+        lastSelectedTable = ''
 
         populateTableAction(name)
     }
@@ -173,6 +178,8 @@
     }
     function tableSelect(dataset, table) {
         document.getElementById("tableDropdownBtn").innerHTML = table;
+        lastSelectedDataset = dataset
+        lastSelectedTable = table
         populateSchemaMapAction(dataset, table)
     }
     function runTest(dataset, table) {
