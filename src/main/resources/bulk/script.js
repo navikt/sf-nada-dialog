@@ -72,6 +72,9 @@ function datasetSelect(name) {
     document.getElementById("report").innerHTML = ""
     document.getElementById("bulkStartBtn").classList.remove("show")
 
+    selectedForBulkDataset = name
+    selectedForBulkTable = ''
+
     populateTableAction(name)
 }
 
@@ -193,9 +196,9 @@ window.onclick = function(event) {
 
 async function reconnectBtnClick() {
     const jobId = document.getElementById('activeJobId').value;
-    if (jobId && lastSelectedTable !== '') {
+    if (jobId && selectedForBulkTable !== '') {
         //alert(`Reconnecting to job ID: ${jobId}`);
-        const response = await fetch('/internal/reconnect?id=' + jobId + "&dataset=" + lastSelectedDataset + "&table=" + lastSelectedTable, {
+        const response = await fetch('/internal/reconnect?id=' + jobId + "&dataset=" + selectedForBulkDataset + "&table=" + selectedForBulkTable, {
             method: 'GET',
             headers: {
                 'Content-Type': 'text/html'
