@@ -171,6 +171,7 @@ fun naisAPI(): HttpHandler = routes(
     },
     "/internal/reconnect" bind Method.GET to {
         val id = it.query("id")
+        // TODO Also need dataset and table provided
         BulkOperation.jobId = id!!
         BulkOperation.operationIsActive = true
         log.info { "Reconnecting gui to jobId $id" }
