@@ -94,6 +94,9 @@ fun JsonObject.findBottomElement(defKey: String): JsonElement {
 
 fun remapAndSendRecords(records: JsonArray, tableId: TableId, fieldDefMap: MutableMap<String, FieldDef>) {
     val builder = InsertAllRequest.newBuilder(tableId)
+    if (!postToBigQuery) {
+        File("/tmp/translateProcess").writeText("") // Clear file
+    }
     records.forEach { record ->
         builder.addRow((record as JsonObject).toRowMap(fieldDefMap))
     }
@@ -120,6 +123,9 @@ fun JsonObject.toRowMap(fieldDefMap: MutableMap<String, FieldDef>): MutableMap<S
     val rowMap: MutableMap<String, Any?> = mutableMapOf()
     fieldDefMap.forEach { defEntry ->
         val element = this.findBottomElement(defEntry.key)
+        if (!postToBigQuery) {
+            File("/tmp/translateProcess").appendText("${element.asString} -> ${defEntry.value.name} (${defEntry.value.type})\n")
+        }
         rowMap[defEntry.value.name] = if (element is JsonNull) {
             null
         } else {
