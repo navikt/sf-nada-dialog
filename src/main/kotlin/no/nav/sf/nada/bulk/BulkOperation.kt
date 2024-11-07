@@ -53,15 +53,21 @@ object BulkOperation {
                 remapAndSendRecords(array, tableId, fieldDef)
             } catch (e: Exception) {
                 dataTransferReport += "\nFail in batch operation - ${e.message}"
+                transferDone = true
                 throw RuntimeException("Fail in batch operation - ${e.message}")
             }
             locator = response.header("Sforce-Locator")
             processedRecords += array.size()
             val reportRow = "Processed ${array.size()} records, next locator: $locator"
             log.info { reportRow }
-            dataTransferReport += "\n$reportRow\nDone ($processedRecords records processed)"
             currentResultLocator = locator
-            if (locator == null) transferDone = true
+            if (locator == null) {
+                dataTransferReport += "\n$reportRow\nDone ($processedRecords records processed)"
+                if (missingFieldWarning > 0) {
+                    dataTransferReport += "\nWarning: Expected fields $missingFieldNames missing in record, total sum ($missingFieldWarning)"
+                }
+                transferDone = true
+            }
         } while (locator != null)
     }
 }
