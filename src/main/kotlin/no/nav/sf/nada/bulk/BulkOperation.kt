@@ -47,6 +47,7 @@ object BulkOperation {
         var locator: String? = null
 
         do {
+            log.info { "LOCATOR: $locator" }
             val response = doSFBulkJobResultQuery(jobId, locator)
             val array = parseCSVToJsonArray(response.bodyString())
             try {
@@ -56,7 +57,13 @@ object BulkOperation {
                 transferDone = true
                 throw RuntimeException("Fail in batch operation - ${e.message}")
             }
+
+            // Next locator
             locator = response.header("Sforce-Locator")
+            if (locator == "null") {
+                log.info { "Locator text null - set to null" }
+                locator = null
+            }
             processedRecords += array.size()
             val reportRow = "Processed ${array.size()} records, next locator: $locator"
             log.info { reportRow }
