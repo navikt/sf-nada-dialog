@@ -225,7 +225,7 @@ function hideSelectElements() {
 
 function showCompletionMessage(data) {
     // Display completion message with records processed
-    document.getElementById('status').innerHTML = 'Job Complete, records processed: ' + data.numberRecordsProcessed + ', job id:' + data.id
+    document.getElementById('status').innerHTML = 'Job Complete, records processed: ' + data.numberRecordsProcessed + ' ('+selectedForBulkDataset + ' ' + selectedForBulkTable +'), job id:' + data.id
 
     // Add event listener for the button
     document.getElementById('startTransfer').addEventListener('click', function() {

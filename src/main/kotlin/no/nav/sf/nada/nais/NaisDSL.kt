@@ -208,7 +208,7 @@ fun naisAPI(): HttpHandler = routes(
             GlobalScope.launch {
                 BulkOperation.runTransferJob()
             }
-            BulkOperation.dataTransferReport = "Job started${if (BulkOperation.dataset.isNotEmpty()) " for ${BulkOperation.dataset}, ${BulkOperation.table}" else ""}...${if (!postToBigQuery) " (Will not actually post due to postToBigQuery flag false)" else ""}"
+            BulkOperation.dataTransferReport = "Job ${BulkOperation.jobId} started${if (BulkOperation.dataset.isNotEmpty()) " for ${BulkOperation.dataset}, ${BulkOperation.table}" else ""}...${if (!postToBigQuery) " (Will not actually post due to postToBigQuery flag false)" else ""}"
             Response(Status.ACCEPTED).body(BulkOperation.dataTransferReport)
         }
     }

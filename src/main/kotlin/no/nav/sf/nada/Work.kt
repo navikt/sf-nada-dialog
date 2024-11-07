@@ -120,6 +120,8 @@ fun remapAndSendRecords(records: JsonArray, tableId: TableId, fieldDefMap: Mutab
 }
 
 fun JsonObject.toRowMap(fieldDefMap: MutableMap<String, FieldDef>): MutableMap<String, Any?> {
+    File("/tmp/translateFieldDef").writeText(gson.toJson(fieldDefMap))
+    File("/tmp/translateObject").writeText(gson.toJson(this))
     val rowMap: MutableMap<String, Any?> = mutableMapOf()
     fieldDefMap.forEach { defEntry ->
         val element = this.findBottomElement(defEntry.key)
