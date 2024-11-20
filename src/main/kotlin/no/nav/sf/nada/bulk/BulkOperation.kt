@@ -10,7 +10,7 @@ import no.nav.sf.nada.Bootstrap
 import no.nav.sf.nada.doSFBulkJobResultQuery
 import no.nav.sf.nada.doSFBulkJobStatusQuery
 import no.nav.sf.nada.doSFBulkStartQuery
-import no.nav.sf.nada.parseCSVToJsonArray
+import no.nav.sf.nada.parseCSVToJsonArrays
 import no.nav.sf.nada.remapAndSendRecords
 import org.http4k.core.HttpHandler
 import org.http4k.core.Response
@@ -133,20 +133,28 @@ object BulkOperation {
 
         do {
             val response = doSFBulkJobResultQuery(jobId, locator)
-            val array = parseCSVToJsonArray(response.bodyString())
-            try {
-                remapAndSendRecords(array, tableId, fieldDef)
-            } catch (e: Exception) {
-                dataTransferReport += "\nFail in batch operation - ${e.message}"
-                transferDone = true
-                throw RuntimeException("Fail in batch operation - ${e.message}")
+            val arrays = parseCSVToJsonArrays(response.bodyString())
+
+            val fragmentsSize = arrays.size
+            val totalCount = arrays.sumOf { it.size() }
+            arrays.forEachIndexed { index, array ->
+                try {
+                    remapAndSendRecords(array, tableId, fieldDef)
+                    processedRecords += array.size()
+                    val reportRow = "Processed ${array.size()} records (${index + 1}/$fragmentsSize of current batch)"
+                    log.info { reportRow }
+                    dataTransferReport += "\n$reportRow"
+                } catch (e: Exception) {
+                    dataTransferReport += "\nFail in batch operation - ${e.message}"
+                    transferDone = true
+                    throw RuntimeException("Fail in batch operation - ${e.message}")
+                }
             }
 
             // Next locator
             locator = response.header("Sforce-Locator")
             if (locator == "null") locator = null
-            processedRecords += array.size()
-            val reportRow = "Processed ${array.size()} records, next locator: $locator"
+            val reportRow = "Done with batch of $totalCount records, next locator: $locator"
             log.info { reportRow }
             dataTransferReport += "\n$reportRow"
             currentResultLocator = locator

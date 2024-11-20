@@ -149,9 +149,11 @@ fun String.addDateRestriction(localDate: LocalDate): String {
 
 fun String.addYesterdayRestriction(): String = this.addDateRestriction(LocalDate.now().minusDays(1))
 
-fun parseCSVToJsonArray(csvData: String): JsonArray {
+fun parseCSVToJsonArrays(csvData: String): List<JsonArray> {
     File("/tmp/csvData").writeText(csvData)
-    val jsonArray = JsonArray()
+    val listOfJsonArrays: MutableList<JsonArray> = mutableListOf()
+    val rowLimit = 50
+    var jsonArray = JsonArray()
 
     // Parse the CSV data with the new approach for headers
     val reader = StringReader(csvData)
@@ -169,13 +171,18 @@ fun parseCSVToJsonArray(csvData: String): JsonArray {
             jsonObject.addProperty(key, if (value.isNullOrBlank()) null else value)
         }
 
+        if (jsonArray.size() == rowLimit) {
+            listOfJsonArrays.add(jsonArray)
+            jsonArray = JsonArray()
+        }
         // Add the JsonObject to the JsonArray
         jsonArray.add(jsonObject)
     }
+    listOfJsonArrays.add(jsonArray)
 
     // Close the reader and parser
     csvParser.close()
     reader.close()
 
-    return jsonArray
+    return listOfJsonArrays
 }
