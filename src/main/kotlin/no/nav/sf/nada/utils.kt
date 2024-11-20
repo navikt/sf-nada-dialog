@@ -100,7 +100,7 @@ fun doSFQuery(query: String): Response {
 }
 
 fun doSFBulkStartQuery(dataset: String, table: String): Response {
-    val query = Bootstrap.mapDef[dataset]!![table]!!.query.replace("+", " ")
+    val query = Bootstrap.mapDef[dataset]!![table]!!.query.addNotRecordsFromTodayRestriction().replace("+", " ")
     val request = Request(Method.POST, "${AccessTokenHandler.instanceUrl}/services/data/v57.0/jobs/query")
         .header("Authorization", "Bearer ${AccessTokenHandler.accessToken}")
         .header("Content-Type", "application/json;charset=UTF-8")
@@ -144,6 +144,13 @@ fun String.addDateRestriction(localDate: LocalDate): String {
         .replace("TODAY", "${localDate.format(DateTimeFormatter.ISO_DATE)}T00:00:00Z".urlEncoded())
         .replace("TOMORROW", "${localDate.plusDays(1).format(DateTimeFormatter.ISO_DATE)}T00:00:00Z".urlEncoded())
         .replace(">", ">".urlEncoded())
+        .replace("<", "<".urlEncoded())
+}
+
+fun String.addNotRecordsFromTodayRestriction(): String {
+    val connector = if (this.contains("WHERE")) "+AND" else "+WHERE"
+    return this + "$connector+LastModifiedDate<TODAY"
+        .replace("TODAY", "${LocalDate.now().format(DateTimeFormatter.ISO_DATE)}T00:00:00Z".urlEncoded())
         .replace("<", "<".urlEncoded())
 }
 
