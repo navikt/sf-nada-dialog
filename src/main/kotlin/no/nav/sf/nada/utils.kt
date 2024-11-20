@@ -18,6 +18,8 @@ import org.http4k.core.Response
 import org.http4k.urlEncoded
 import java.io.File
 import java.io.StringReader
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -99,8 +101,10 @@ fun doSFQuery(query: String): Response {
     return response
 }
 
+fun String.urlDecoded() = URLDecoder.decode(this, StandardCharsets.UTF_8.toString())
+
 fun doSFBulkStartQuery(dataset: String, table: String): Response {
-    val query = Bootstrap.mapDef[dataset]!![table]!!.query.addNotRecordsFromTodayRestriction().replace("+", " ")
+    val query = Bootstrap.mapDef[dataset]!![table]!!.query.addNotRecordsFromTodayRestriction().urlDecoded()
     val request = Request(Method.POST, "${AccessTokenHandler.instanceUrl}/services/data/v57.0/jobs/query")
         .header("Authorization", "Bearer ${AccessTokenHandler.accessToken}")
         .header("Content-Type", "application/json;charset=UTF-8")
