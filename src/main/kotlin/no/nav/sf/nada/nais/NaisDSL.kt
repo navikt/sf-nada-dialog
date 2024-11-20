@@ -31,7 +31,8 @@ fun api(): HttpHandler = routes(
     "/internal/performBulk" bind Method.GET to BulkOperation.performBulkHandler,
     "/internal/reconnect" bind Method.GET to BulkOperation.reconnectHandler,
     "/internal/activeId" bind Method.GET to BulkOperation.activeIdHandler,
-    "/internal/transfer" bind Method.GET to BulkOperation.transferHandler
+    "/internal/transfer" bind Method.GET to BulkOperation.transferHandler,
+    "/internal/reset" bind Method.GET to BulkOperation.resetHandler
 )
 
 fun apiServer(port: Int = 8080) = api().asServer(ApacheServer(port))

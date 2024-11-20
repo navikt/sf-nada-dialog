@@ -215,6 +215,22 @@ async function reconnectBtnClick() {
     }
 }
 
+async function resetBtnClick() {
+    const confirmReset = confirm(`This will reset backend state`);
+    if (confirmReset) {
+        const response = await fetch('/internal/reset', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'text/html'
+            }
+        });
+
+        const t = await response
+
+        location.reload();
+    }
+}
+
 function hideSelectElements() {
     // Select elements by class name and hide them
     const elementsToHide = document.querySelectorAll('.jobIdHolder, .datasetDropdownHolder, .tableDropdownHolder, .bulkStartHolder, #description');

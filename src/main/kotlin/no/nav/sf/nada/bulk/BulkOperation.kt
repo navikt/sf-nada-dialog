@@ -51,6 +51,22 @@ object BulkOperation {
 
     val missingFieldNames: MutableSet<String> = mutableSetOf()
 
+    val resetHandler: HttpHandler = {
+        operationIsActive = false
+        dataset = ""
+        table = ""
+        jobId = ""
+        jobComplete = false
+        currentResultLocator = null
+        dataTransferIsActive = false
+        dataTransferReport = ""
+        transferDone = false
+        processedRecords = 0
+        missingFieldWarning = 0
+        missingFieldNames.clear()
+        Response(Status.OK)
+    }
+
     val performBulkHandler: HttpHandler = {
         if (!operationIsActive) {
             val dataset = it.query("dataset")
