@@ -16,9 +16,15 @@ Each push to this repository will trigger a deployment to either dev-gcp or prod
 
 You can examine the current state of the app at these ingresses (naisdevice required):
 
-Dev: https://sf-nada-dialog.intern.dev.nav.no/examine
+Dev: https://sf-nada-dialog.intern.dev.nav.no/internal/examine
 
-Prod: https://sf-nada-dialog.intern.nav.no/examine
+Prod: https://sf-nada-dialog.intern.nav.no/internal/examine
+
+You can perform bulk operations (initial transfer of all data > 100_000 records) using these ingresses:
+
+Dev: https://sf-nada-dialog.intern.dev.nav.no/internal/bulk
+
+Prod: https://sf-nada-dialog.intern.nav.no/internal/bulk
 
 ### Config
 
