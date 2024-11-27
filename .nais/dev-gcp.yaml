@@ -45,8 +45,6 @@ spec:
         permission: READWRITE
       - name: arbeidsgiver_data_dev
         permission: READWRITE
-      - name: bjorntest
-        permission: READWRITE
   accessPolicy:
     outbound:
       external:
@@ -54,13 +52,9 @@ spec:
         - host: navdialog--preprod.sandbox.my.salesforce.com
   env:
     - name: POST_TO_BIGQUERY
-      value: 'false'
-    - name: RUN_SESSION_ON_STARTUP
-      value: 'false'
-    - name: FETCH_ALL_RECORDS
-      value: 'false'
+      value: 'true'
     - name: EXCLUDE_TABLES
-      value: ''
+      value: 'arbeidsgiver_oppgaver_dev'
     - name: MAPDEF_FILE
       value: '/mapdef/dev.json'
     - name: SF_TOKENHOST

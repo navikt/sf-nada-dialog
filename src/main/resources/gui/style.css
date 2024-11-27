@@ -1,0 +1,317 @@
+body {
+    background-color: #dddddd
+}
+/* Spinner styles */
+.spinner {
+    display: none;
+    margin: 50px auto;
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #3498DB;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#project-title {
+    font-family: Arial;
+    font-size: 20px;
+    color: #a1a1a1;
+    text-align: center;
+}
+
+/* Dataset section styles */
+.dataset-section {
+    margin: 20px 0;
+    padding: 15px;                /* Add padding inside the section */
+    border: 2px solid #ccc;      /* Add a light grey border */
+    border-radius: 10px;         /* Make the border rounded */
+    background-color: #f5f5f5;   /* Light grey background */
+}
+
+.dataset-header {
+    color: #0e2a3d;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    padding-left: 20px;  /* Ensure the header aligns with the table content */
+}
+
+.table {
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 10px;
+}
+
+.table .table-header {
+    cursor: pointer;
+    font-size: 18px;
+    background-color: #3498DB;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between; /* Distribute content */
+    align-items: center; /* Vertically align items */
+}
+
+.name-and-label-wrapper {
+    display: flex;
+    align-items: center; /* Align the table name and label vertically */
+}
+
+.table .table-header:hover {
+    background-color: #2980B9;
+}
+
+.inactive-label {
+    font-family: Arial, sans-serif;
+    background-color: #d4cd8c;
+    color: #2876ab;
+    padding: 4px 5px;
+    border-radius: 5px;
+    margin-left: 10px; /* Space between table name and label */
+    font-size: 13px;
+}
+
+.inactive-label:hover {
+    color: #6c703b;
+}
+
+.row-count {
+    color: lightcyan;
+    /*font-weight: bold;*/
+    /*color: #555;*/ /* Optional: Row count text color */
+}
+
+.updated {
+    color: #fcf2c6;
+    /*font-weight: bold;*/
+    /*color: #555;*/ /* Optional: Row count text color */
+}
+
+
+.table-columns {
+    /*display: none;*/
+    margin-top: 10px;
+}
+
+.table-columns table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-columns th, .table-columns td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+
+.table-columns th {
+    background-color: #f9f9f9;
+}
+
+.table-columns th:nth-child(1), .table-columns td:nth-child(1) {
+    width: 150px; /* Fixed width for the first column */
+}
+
+.table-columns th:nth-child(2), .table-columns td:nth-child(2) {
+    width: 150px; /* Fixed width for the second column */
+}
+/* Add zebra striping */
+.table-columns tr:nth-child(odd) {
+    background-color: #f7faff; /* Light blue-grey color */
+}
+
+.table-columns tr:nth-child(even) {
+    background-color: #ffffff; /* White for alternating rows */
+}
+
+.no-mapping-text {
+    display: inline-block; /* Ensure it behaves like a block within the cell */
+    background-color: #fff9c4; /* Light yellow background */
+    border: 1px solid #FFD54F; /* Yellow border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 3px 8px; /* Padding for better spacing */
+    margin: 2px; /* Margin around the text */
+    font-size: 14px; /* Adjust font size for readability */
+    color: #5d4037; /* Slightly darker text color for contrast */
+}
+.salesforce-query {
+    background-color: #f9f9f9; /* Light grey background */
+    border: 1px solid #ccc;    /* Light grey border */
+    border-radius: 10px;       /* Rounded corners */
+    padding: 10px;             /* Internal spacing */
+    margin-bottom: 15px;       /* Space below the query */
+    font-family: monospace;    /* Monospaced font for query readability */
+    white-space: pre-wrap;     /* Preserve whitespace and allow wrapping */
+    word-wrap: break-word;     /* Break long words for better display */
+    color: #333;               /* Darker text for contrast */
+}
+
+.button-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0; /* Add some spacing around the buttons */
+}
+
+.test-query-button {
+    background-color: #f0f8ff; /* Gentle blue color */
+    color: #000; /* Black text */
+    border: 1px solid #ccc; /* Light border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 8px 12px; /* Button padding */
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.test-query-button:hover {
+    background-color: #e0f0ff; /* Slightly darker blue on hover */
+}
+
+.bulk-transfer-button {
+    background-color: #ffcccc; /* Warning red color */
+    color: #900; /* Dark red text */
+    border: 1px solid #d9534f; /* Red border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 8px 12px; /* Button padding */
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.bulk-transfer-button:hover {
+    background-color: #ffaaaa; /* Slightly darker red on hover */
+}
+
+/* Spinner */
+.small-spinner {
+    width: 15px;
+    height: 15px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: none;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.spinner-row {
+    border: 4px solid rgba(255, 255, 255, 0.3); /* Light border */
+    border-top: 4px solid #fff; /* Darker border for spinner effect */
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    animation: spin 1s linear infinite; /* Rotating animation */
+    display: inline-block;
+    margin-left: 5px; /* Optional: Space between spinner and text */
+}
+
+/* Results */
+.query-result {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    font-family: Arial, sans-serif;
+}
+
+.result-blue {
+    background-color: #e7f3ff;
+    border-color: #3498db;
+}
+
+.result-green {
+    background-color: #e8f5e9;
+    border-color: #4caf50;
+}
+
+.result-red {
+    background-color: #ffebee;
+    border-color: #e57373;
+}
+
+/* No mapping configured styling */
+.no-mapping {
+    border: 1px solid #ccc;
+    padding: 2px 5px;
+    border-radius: 5px;
+    background-color: #fffae5;
+}
+
+/* Spinner animation */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.field-name-text {
+    /*font-style: italic;*//* Makes the field name bold */
+    color: darkred; /* Dark gray */
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    /*background-color: #ffcccc;*/
+    background-color: #e7f3ff;
+    border-color: #3498db;
+    /*color: #900;*/
+    font-family: Arial;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    width: 450px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.modal-action-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.modal-action-button:hover {
+    background-color: #0056b3;
+}
+
+.modal-action-button:last-child {
+    background-color: #6c757d;
+}
+
+.modal-action-button:last-child:hover {
+    background-color: #565e64;
+}

@@ -9,15 +9,8 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.google.gson.JsonPrimitive
 import mu.KotlinLogging
-import no.nav.sf.nada.Bootstrap.SF_QUERY_BASE
-import no.nav.sf.nada.Bootstrap.bigQueryService
-import no.nav.sf.nada.Bootstrap.excludeTables
-import no.nav.sf.nada.Bootstrap.fetchAllRecords
-import no.nav.sf.nada.Bootstrap.hasPostedToday
-import no.nav.sf.nada.Bootstrap.mapDef
-import no.nav.sf.nada.Bootstrap.postToBigQuery
-import no.nav.sf.nada.bulk.BulkOperation.missingFieldNames
-import no.nav.sf.nada.bulk.BulkOperation.missingFieldWarning
+import no.nav.sf.nada.HttpCalls.doSFQuery
+import no.nav.sf.nada.bulk.BulkOperation
 import no.nav.sf.nada.token.AccessTokenHandler
 import org.http4k.core.Response
 import java.io.File
@@ -33,22 +26,22 @@ fun fetchAndSend(localDate: LocalDate?, dataset: String, table: String) {
     } else {
         log.info { "Will perform fetchAndSend for dataset $dataset table $table on localDate $localDate" }
     }
-    if (!mapDef.containsKey(dataset)) {
+    if (!application.mapDef.containsKey(dataset)) {
         throw RuntimeException("mapDef.json is missing a definition for dataset $dataset")
-    } else if (mapDef[dataset]?.containsKey(table) == false) {
+    } else if (application.mapDef[dataset]?.containsKey(table) == false) {
         throw RuntimeException("mapDef.json is missing a definition for table $table in dataset $dataset")
     }
-    val query = mapDef[dataset]!![table]!!.query.let { q ->
+    val query = application.mapDef[dataset]!![table]!!.query.let { q ->
         if (localDate == null) q else q.addDateRestriction(localDate)
     }
     log.info { "Will use query: $query" }
 
-    val fieldDef = mapDef[dataset]!![table]!!.fieldDefMap
+    val fieldDef = application.mapDef[dataset]!![table]!!.fieldDefMap
 
     val tableId = TableId.of(dataset, table)
 
     Metrics.fetchRequest.inc()
-    var response = doSFQuery("${AccessTokenHandler.instanceUrl}$SF_QUERY_BASE$query")
+    var response = doSFQuery("${AccessTokenHandler.instanceUrl}${application.sfQueryBase}$query")
     // File("/tmp/latestresponsebody-$table").writeText(response.bodyString())
     var obj: JsonObject
     try {
@@ -88,8 +81,6 @@ fun JsonObject.findBottomElement(defKey: String): JsonElement {
     val subKeys = defKey.split(".")
     val depth = subKeys.size
     if (!this.has(subKeys[0])) {
-        missingFieldWarning++
-        missingFieldNames.add(subKeys[0])
         return JsonNull.INSTANCE
     }
     if (depth == 1) return this[defKey]
@@ -102,22 +93,16 @@ fun JsonObject.findBottomElement(defKey: String): JsonElement {
 
 fun remapAndSendRecords(records: JsonArray, tableId: TableId, fieldDefMap: MutableMap<String, FieldDef>) {
     val builder = InsertAllRequest.newBuilder(tableId)
-    if (!postToBigQuery) {
-        File("/tmp/translateProcess").writeText("") // Clear file
-    }
     records.forEach { record ->
         builder.addRow((record as JsonObject).toRowMap(fieldDefMap))
-    }
-    if (missingFieldWarning > 0) {
-        log.warn { "Expected field $missingFieldNames missing in record, total sum ($missingFieldWarning)" }
     }
     val insertAllRequest = builder.build()
     records.last().let { File("/tmp/latestRecord_${tableId.table}").writeText("$it") }
     insertAllRequest.rows.last().let { File("/tmp/latestRow_${tableId.table}").writeText("$it") }
     insertAllRequest.rows.map { "$it" }.joinToString(",\n")
         .let { File("/tmp/allRows_${tableId.table}").writeText("$it") }
-    if (postToBigQuery) {
-        val response = bigQueryService.insertAll(insertAllRequest)
+    if (application.postToBigQuery && !(application.excludeTables.any { it == tableId.table })) {
+        val response = application.bigQueryService.insertAll(insertAllRequest)
         if (response.hasErrors()) {
             log.error { "Failure at insert: ${response.insertErrors}" }
             throw RuntimeException("Failure at insert: ${response.insertErrors}")
@@ -146,11 +131,11 @@ fun JsonObject.toRowMap(fieldDefMap: MutableMap<String, FieldDef>): MutableMap<S
             null
         } else {
             when (defEntry.value.type) {
-                Type.STRING -> element.asString
-                Type.INTEGER -> element.asInt
-                Type.DATETIME -> element.asString.subSequence(0, 23)
-                Type.DATE -> element.asString
-                Type.BOOL -> element.asBoolean
+                SupportedType.STRING -> element.asString
+                SupportedType.INTEGER -> element.asInt
+                SupportedType.DATETIME -> element.asString.subSequence(0, 23)
+                SupportedType.DATE -> element.asString
+                SupportedType.BOOL -> element.asBoolean
             }
         }
     }
@@ -158,20 +143,21 @@ fun JsonObject.toRowMap(fieldDefMap: MutableMap<String, FieldDef>): MutableMap<S
 }
 
 internal fun work(targetDate: LocalDate = LocalDate.now().minusDays(1)) {
-    log.info { "Work session starting to fetch for ${if (fetchAllRecords) "ALL" else "$targetDate"} excluding $excludeTables - post to BQ: $postToBigQuery" }
+    BulkOperation.initOperationInfo(application.mapDef) // Clear operation state for bulk jobs via gui
+    log.info { "Work session starting to fetch for $targetDate excluding ${application.excludeTables} - post to BQ: ${application.postToBigQuery}" }
     try {
-        mapDef.keys.forEach { dataset ->
-            mapDef[dataset]!!.keys.filter {
-                !(excludeTables.contains(it)).also { excluding -> if (excluding) log.info { "Will skip excluded table $it" } }
+        application.mapDef.keys.forEach { dataset ->
+            application.mapDef[dataset]!!.keys.filter {
+                !(application.excludeTables.contains(it)).also { excluding -> if (excluding) log.info { "Will skip excluded table $it" } }
             }
                 .forEach { table ->
-                    log.info { "Will attempt fetch and send for dataset $dataset, table $table, date ${if (fetchAllRecords) "ALL" else targetDate}" }
-                    fetchAndSend(if (fetchAllRecords) null else targetDate, dataset, table)
-                    hasPostedToday = true
+                    log.info { "Will attempt fetch and send for dataset $dataset, table $table, date $targetDate" }
+                    fetchAndSend(targetDate, dataset, table)
+                    application.hasPostedToday = true
                 }
         }
     } catch (e: Exception) {
-        log.error { "Failed to do work ${e.message} - has posted partially: $hasPostedToday" }
+        log.error { "Failed to do work ${e.message} - has posted partially: ${application.hasPostedToday}" }
     }
     log.info { "Work session finished" }
 }
