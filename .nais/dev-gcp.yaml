@@ -45,8 +45,6 @@ spec:
         permission: READWRITE
       - name: arbeidsgiver_data_dev
         permission: READWRITE
-      - name: bjorntest
-        permission: READWRITE
   accessPolicy:
     outbound:
       external:
