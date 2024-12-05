@@ -4,6 +4,14 @@ import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
+import no.nav.sf.nada.env
+import no.nav.sf.nada.env_SF_TOKENHOST
+import no.nav.sf.nada.secret_KeystorePassword
+import no.nav.sf.nada.secret_PrivateKeyAlias
+import no.nav.sf.nada.secret_PrivateKeyPassword
+import no.nav.sf.nada.secret_SFClientID
+import no.nav.sf.nada.secret_SFUsername
+import no.nav.sf.nada.secret_keystoreJKSB64
 import org.apache.commons.codec.binary.Base64.decodeBase64
 import org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString
 import org.http4k.client.ApacheClient
@@ -27,21 +35,21 @@ object AccessTokenHandler {
     val instanceUrl get() = fetchAccessTokenAndInstanceUrl().second
 
     fun refreshToken() {
-        if ((AccessTokenHandler.expireTime - System.currentTimeMillis()) / 60000 < 30) { // Refresh if expireTime within 30 min
-            AccessTokenHandler.log.info { "Refreshing access token" }
-            AccessTokenHandler.accessToken
+        if ((expireTime - System.currentTimeMillis()) / 60000 < 30) { // Refresh if expireTime within 30 min
+            log.info { "Refreshing access token" }
+            accessToken
         }
     }
 
     private val log = KotlinLogging.logger { }
 
-    private val SFTokenHost: Lazy<String> = lazy { System.getenv("SF_TOKENHOST") }
-    private val SFClientID = System.getenv("SFClientID")
-    private val SFUsername = System.getenv("SFUsername")
-    private val keystoreB64 = System.getenv("keystoreJKSB64")
-    private val keystorePassword = System.getenv("KeystorePassword")
-    private val privateKeyAlias = System.getenv("PrivateKeyAlias")
-    private val privateKeyPassword = System.getenv("PrivateKeyPassword")
+    private val SFTokenHost = env(env_SF_TOKENHOST)
+    private val SFClientID = env(secret_SFClientID)
+    private val SFUsername = env(secret_SFUsername)
+    private val keystoreB64 = env(secret_keystoreJKSB64)
+    private val keystorePassword = env(secret_KeystorePassword)
+    private val privateKeyAlias = env(secret_PrivateKeyAlias)
+    private val privateKeyPassword = env(secret_PrivateKeyPassword)
 
     private val client: Lazy<HttpHandler> = lazy { ApacheClient() }
 
@@ -61,11 +69,11 @@ object AccessTokenHandler {
         val expireMomentSinceEpochInSeconds = (System.currentTimeMillis() / 1000) + expTimeSecondsClaim
         val claim = JWTClaim(
             iss = SFClientID,
-            aud = SFTokenHost.value,
+            aud = SFTokenHost,
             sub = SFUsername,
             exp = expireMomentSinceEpochInSeconds.toString()
         )
-        val privateKey = PrivateKeyFromBase64Store(
+        val privateKey = privateKeyFromBase64Store(
             ksB64 = keystoreB64,
             ksPwd = keystorePassword,
             pkAlias = privateKeyAlias,
@@ -76,7 +84,7 @@ object AccessTokenHandler {
         }.${gson.toJson(claim).encodeB64UrlSafe()}"
         val fullClaimSignature = privateKey.sign(claimWithHeaderJsonUrlSafe.toByteArray())
 
-        val accessTokenRequest = Request(Method.POST, SFTokenHost.value + "/services/oauth2/token")
+        val accessTokenRequest = Request(Method.POST, "$SFTokenHost/services/oauth2/token")
             .header("Content-Type", "application/x-www-form-urlencoded")
             .body(
                 listOf(
@@ -87,8 +95,7 @@ object AccessTokenHandler {
 
         for (retry in 1..4) {
             try {
-                lateinit var response: Response
-                response = client.value(accessTokenRequest)
+                val response: Response = client.value(accessTokenRequest)
                 if (response.status.code == 200) {
                     File("/tmp/latestAccessTokenResponse").writeText(response.toMessage())
                     val accessTokenResponse = gson.fromJson(response.bodyString(), AccessTokenResponse::class.java)
@@ -105,7 +112,7 @@ object AccessTokenHandler {
         return Pair("", "")
     }
 
-    private fun PrivateKeyFromBase64Store(ksB64: String, ksPwd: String, pkAlias: String, pkPwd: String): PrivateKey {
+    private fun privateKeyFromBase64Store(ksB64: String, ksPwd: String, pkAlias: String, pkPwd: String): PrivateKey {
         return KeyStore.getInstance("JKS").apply { load(ksB64.decodeB64().inputStream(), ksPwd.toCharArray()) }.run {
             getKey(pkAlias, pkPwd.toCharArray()) as PrivateKey
         }

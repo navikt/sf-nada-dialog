@@ -3,23 +3,15 @@ package no.nav.sf.nada
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import no.nav.kafka.dialog.ShutdownHook
-import no.nav.sf.nada.token.AccessTokenHandler
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
-import org.http4k.core.Method
-import org.http4k.core.Request
-import org.http4k.core.Response
 import org.http4k.urlEncoded
 import java.io.File
 import java.io.StringReader
-import java.net.URLDecoder
-import java.nio.charset.StandardCharsets
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -55,91 +47,29 @@ fun conditionalWait(ms: Long) =
         cr.join()
     }
 
-/**
- * Shortcuts for fetching environment variables
- */
-fun env(env: String): String { return System.getenv(env) }
+object ShutdownHook {
 
-fun envAsBoolean(env: String): Boolean { return System.getenv(env).trim().toBoolean() }
+    private val log = KotlinLogging.logger { }
 
-fun envAsList(env: String): List<String> { return System.getenv(env).split(",").map { it.trim() }.toList() }
+    @Volatile
+    private var shutdownhookActiveOrOther = false
+    private val mainThread: Thread = Thread.currentThread()
 
-enum class Type { STRING, INTEGER, DATETIME, DATE, BOOL }
-data class FieldDef(val name: String, val type: Type)
-data class TableDef(val query: String, val fieldDefMap: MutableMap<String, FieldDef>)
-
-fun parseMapDef(filePath: String): Map<String, Map<String, TableDef>> =
-    parseMapDef(JsonParser.parseString(Bootstrap::class.java.getResource(filePath).readText()) as JsonObject)
-
-fun parseMapDef(obj: JsonObject): Map<String, Map<String, TableDef>> {
-    val result: MutableMap<String, MutableMap<String, TableDef>> = mutableMapOf()
-
-    obj.entrySet().forEach { dataSetEntry ->
-        val objDS = dataSetEntry.value.asJsonObject
-        result[dataSetEntry.key] = mutableMapOf()
-        objDS.entrySet().forEach { tableEntry ->
-            val objT = tableEntry.value.asJsonObject
-            val query = objT["query"]!!.asString.replace(" ", "+")
-            val objS = objT["schema"]!!.asJsonObject
-            result[dataSetEntry.key]!![tableEntry.key] = TableDef(query, mutableMapOf())
-            objS.entrySet().forEach { fieldEntry ->
-                val fieldDef = gson.fromJson(fieldEntry.value, FieldDef::class.java)
-                result[dataSetEntry.key]!![tableEntry.key]!!.fieldDefMap[fieldEntry.key] = fieldDef
-            }
-        }
+    init {
+        log.info { "Installing shutdown hook" }
+        Runtime.getRuntime()
+            .addShutdownHook(
+                object : Thread() {
+                    override fun run() {
+                        shutdownhookActiveOrOther = true
+                        log.info { "shutdown hook activated" }
+                        mainThread.join()
+                    }
+                })
     }
-    return result
-}
 
-fun doSFQuery(query: String): Response {
-    val request = Request(Method.GET, "$query")
-        .header("Authorization", "Bearer ${AccessTokenHandler.accessToken}")
-        .header("Content-Type", "application/json;charset=UTF-8")
-    // File("/tmp/queryToHappen").writeText(request.toMessage())
-    val response = Bootstrap.client.value(request)
-    // File("/tmp/responseThatHappend").writeText(response.toMessage())
-    return response
-}
-
-fun String.urlDecoded() = URLDecoder.decode(this, StandardCharsets.UTF_8.toString())
-
-fun doSFBulkStartQuery(dataset: String, table: String): Response {
-    val query = Bootstrap.mapDef[dataset]!![table]!!.query.addNotRecordsFromTodayRestriction().urlDecoded()
-    val request = Request(Method.POST, "${AccessTokenHandler.instanceUrl}/services/data/v57.0/jobs/query")
-        .header("Authorization", "Bearer ${AccessTokenHandler.accessToken}")
-        .header("Content-Type", "application/json;charset=UTF-8")
-        .body(
-            """{
-                "operation": "query",
-                "query": "$query",
-                "contentType": "CSV"
-                  }""".trim()
-        )
-
-    File("/tmp/bulkQueryToHappen").writeText(request.toMessage())
-    val response = Bootstrap.client.value(request)
-    File("/tmp/bulkResponseThatHappend").writeText(response.toMessage())
-    return response
-}
-
-fun doSFBulkJobStatusQuery(jobId: String): Response {
-    val request = Request(Method.GET, "${AccessTokenHandler.instanceUrl}/services/data/v57.0/jobs/query/$jobId")
-        .header("Authorization", "Bearer ${AccessTokenHandler.accessToken}")
-        .header("Content-Type", "application/json;charset=UTF-8")
-    File("/tmp/bulkJobStatusQueryToHappen").writeText(request.toMessage())
-    val response = Bootstrap.client.value(request)
-    File("/tmp/bulkJobStatusResponseThatHappend").writeText(response.toMessage())
-    return response
-}
-
-fun doSFBulkJobResultQuery(jobId: String, locator: String? = null): Response {
-    // GET /services/data/v57.0/jobs/query/<jobID>/results
-    val request = Request(Method.GET, "${AccessTokenHandler.instanceUrl}/services/data/v57.0/jobs/query/$jobId/results${locator?.let{"?locator=$locator"} ?: ""}")
-        .header("Authorization", "Bearer ${AccessTokenHandler.accessToken}")
-
-    val response = Bootstrap.client.value(request)
-    File("/tmp/bulkJobResultResponse${locator?.let{"-$locator"} ?: ""}").writeText(response.toMessage())
-    return response
+    fun isActive() = shutdownhookActiveOrOther
+    fun reset() { shutdownhookActiveOrOther = false }
 }
 
 fun String.addDateRestriction(localDate: LocalDate): String {
@@ -149,6 +79,15 @@ fun String.addDateRestriction(localDate: LocalDate): String {
         .replace("TOMORROW", "${localDate.plusDays(1).format(DateTimeFormatter.ISO_DATE)}T00:00:00Z".urlEncoded())
         .replace(">", ">".urlEncoded())
         .replace("<", "<".urlEncoded())
+}
+
+fun String.addLimitRestriction(maxRecords: Int = 1000): String {
+    val connector = if (this.contains("LIMIT", ignoreCase = true)) {
+        throw IllegalArgumentException("Query already contains a LIMIT clause.")
+    } else {
+        "+LIMIT"
+    }
+    return "$this$connector+$maxRecords"
 }
 
 fun String.addNotRecordsFromTodayRestriction(): String {

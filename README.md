@@ -14,29 +14,18 @@ and [prod.json](src/main/resources/mapdef/prod.json)
 
 Each push to this repository will trigger a deployment to either dev-gcp or prod-gcp, defined in [main.yml](.github/workflows/main.yml)
 
-You can examine the current state of the app at these ingresses (naisdevice required):
+You can examine the current state of the app and perform an initial bulk job to transfer all data at these ingresses (naisdevice required):
 
-Dev: https://sf-nada-dialog.intern.dev.nav.no/internal/examine
+Dev: https://sf-nada-dialog.intern.dev.nav.no/internal/gui
 
-Prod: https://sf-nada-dialog.intern.nav.no/internal/examine
+Prod: https://sf-nada-dialog.intern.nav.no/internal/gui
 
-You can perform bulk operations (initial transfer of all data > 100_000 records) using these ingresses:
-
-Dev: https://sf-nada-dialog.intern.dev.nav.no/internal/bulk
-
-Prod: https://sf-nada-dialog.intern.nav.no/internal/bulk
 
 ### Config
 
 You will see the current active config on the examine-ingresses above. They are set by env-variables in [dev-gcp.yaml](.nais/dev-gcp.yaml) and [prod-gcp.yaml](.nais/prod-gcp.yaml)
 #### POST_TO_BIGQUERY
 Default is true. Whether you will actually send the fetched data to bigquery or not.
-#### RUN_SESSION_ON_STARTUP
-Default is false. This will trigger a work session directly on deploy, instead of waiting to next morning. Use for instance when you want to do an initial data dump.
-Remember to turn this to false once you are done since you otherwise will have duplicate posts each time the app reboots.
-#### FETCH_ALL_RECORDS
-Default is false. This will ignore the LastModifedDate == yesterday restriction when fetching data from salesforce and fetch all records found.
-Used for instance when you want to do an initial data dump.
 #### EXCLUDE_TABLES
 Default is ''. A comma seperated list of tables to ignore when fetching data. Used for instance to ignore existing products when performing a data dump on a new one.
 
@@ -63,10 +52,9 @@ They are well formed json-objects defined as:
 ```
 Note that you can map nested fields in Salesforce. I.e "LiveChatButton.MasterLabel" is a legal field name.
 
-### Examine-ingesses
+### Gui-ingesses
 
-You can use the examine ingresses (https://sf-nada-dialog.dev.intern.nav.no/internal/examine, https://sf-nada-dialog.intern.nav.no/internal/examine) to examine the state of the app in dev and prod. Here you can click on the dataset- and table buttons
-to verify how the current deployed map definition file are being parsed by the app. You can also run the query for that table (returning a total count) to see if the fetch from salesforce
-goes through successfully.
-
-If you are deploying with intent to verify a new addition in the examine-ingress, it is recommended to turn off POST_TO_BIG_QUERY until you are happy with the verification.
+You can use the gui ingresses (https://sf-nada-dialog.dev.intern.nav.no/internal/gui, https://sf-nada-dialog.intern.nav.no/internal/gui) to examine the state of the app in dev and prod. Here you can expand each table
+to verify how the current deployed map definition file are being parsed by the app versus metadata from BigQuery. You can also run the query for that table (returning a total count) to see if the fetch from salesforce
+goes through successfully, and perform a bulk transfer that in a first step prepares the data in Salesforce and in a second step transfers the data to BigQuery. 
+If POST_TO_BIGQUERY is false or a table you are looking at is listed in EXCLUDE_TABLES you only get to simulate the transfer of data to BigQuery - no data will be sent.
