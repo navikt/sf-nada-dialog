@@ -1,8 +1,11 @@
 package no.nav.sf.nada.gui
 
 import com.google.cloud.bigquery.BigQuery
+import com.google.cloud.bigquery.Schema
 import com.google.cloud.bigquery.StandardTableDefinition
 import com.google.cloud.bigquery.Table
+import com.google.cloud.bigquery.TableDefinition
+import com.google.cloud.bigquery.ViewDefinition
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import mu.KotlinLogging
@@ -155,11 +158,31 @@ object Gui {
                     throw e
                 }
                 // log.info { "Table definition before" }
-                val definition = fullTable.getDefinition<StandardTableDefinition>()
+                val definition = fullTable.getDefinition<TableDefinition>()
+
+                var numRows = 0L
+                var schema: Schema
+                when (definition) {
+                    is StandardTableDefinition -> {
+                        // Handle the standard table case
+                        numRows = definition.numRows!!
+                        schema = definition.schema!!
+                        log.info { "Table ${table.tableId.table} is a standard table with $numRows rows and schema $schema" }
+                    }
+                    is ViewDefinition -> {
+                        // Handle the view case
+                        val query = definition.query
+                        schema = definition.schema!!
+                        log.info { "Table ${table.tableId.table} is a view with query: $query" }
+                    }
+                    else -> {
+                        // Handle other cases, if any
+                        log.warn { "Table ${table.tableId.table} definition is of unexpected type: ${definition::class.java}" }
+                        throw RuntimeException("Table ${table.tableId.table} definition is of unexpected type: ${definition::class.java}")
+                    }
+                }
                 // log.info { "Table definition after - $tableName" }
-                val numRows = fullTable.numRows.toLong()
-                // log.info { "Table definition after numRows - $tableName" }
-                val schema = definition.schema
+                // log.info { "Table definition after numRows - $tableName" } a
                 // log.info { "Table definition schema - $tableName - schema: $schema" }
                 // List of column metadata
                 val columns = mutableListOf<ColumnMetadata>()

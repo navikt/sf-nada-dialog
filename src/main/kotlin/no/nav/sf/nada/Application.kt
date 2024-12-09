@@ -100,7 +100,7 @@ class Application {
                     if (LocalTime.now().inActiveRange()) {
                         work()
                     } else {
-                        log.info { "Waiting for active range (later then ${resetRangeStop.format(DateTimeFormatter.ISO_DATE)}) - will sleep 30 minutes." }
+                        log.info { "Waiting for active range (later then ${resetRangeStop.format(DateTimeFormatter.ISO_TIME)}) - will sleep 30 minutes." }
                     }
                 }
                 conditionalWait(1800000) // Half an hour
