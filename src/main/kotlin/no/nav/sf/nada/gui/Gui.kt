@@ -1,11 +1,9 @@
 package no.nav.sf.nada.gui
 
 import com.google.cloud.bigquery.BigQuery
-import com.google.cloud.bigquery.Schema
 import com.google.cloud.bigquery.StandardTableDefinition
 import com.google.cloud.bigquery.Table
 import com.google.cloud.bigquery.TableDefinition
-import com.google.cloud.bigquery.ViewDefinition
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import mu.KotlinLogging
@@ -127,8 +125,7 @@ object Gui {
         val tables: List<TableMetadata>
     )
 
-    // Function to fetch BigQuery metadata
-    fun fetchBigQueryMetadata(mapDef: Map<String, Map<String, TableDef>>): BigQueryMetadata {
+    private fun fetchBigQueryMetadata(mapDef: Map<String, Map<String, TableDef>>): BigQueryMetadata {
         val result = mutableMapOf<String, DatasetMetadata>()
 
         // List datasets in the project
@@ -142,117 +139,95 @@ object Gui {
             // List tables in the dataset
             val tables = application.bigQueryService.listTables(datasetName).iterateAll()
             for (table in tables) {
-                val tableName = table.tableId.table
-
-                val tableQuery = mapDef[datasetName]?.get(tableName)?.query?.let { it.replace("+", " ") } ?: "No query configured"
-
-                val selectFields = extractFields(tableQuery)
-                // Get table metadata
                 val fullTable: Table
                 try {
-                    // log.info { "Attempting to fetch table $tableName" }
                     fullTable = application.bigQueryService.getTable(table.tableId, BigQuery.TableOption.fields(BigQuery.TableField.NUM_ROWS, BigQuery.TableField.SCHEMA))
-                    // log.info { "Found table $tableName - ${fullTable.numRows.toLong()}" }
                 } catch (e: Exception) {
                     log.error { e.printStackTrace() }
                     throw e
                 }
-                // log.info { "Table definition before" }
                 val definition = fullTable.getDefinition<TableDefinition>()
 
-                var numRows = 0L
-                var schema: Schema
-                when (definition) {
-                    is StandardTableDefinition -> {
-                        // Handle the standard table case
-                        numRows = definition.numRows!!
-                        schema = definition.schema!!
-                        log.info { "Table ${table.tableId.table} is a standard table with $numRows rows and schema $schema" }
-                    }
-                    is ViewDefinition -> {
-                        // Handle the view case
-                        val query = definition.query
-                        schema = definition.schema!!
-                        log.info { "Table ${table.tableId.table} is a view with query: $query" }
-                    }
-                    else -> {
-                        // Handle other cases, if any
-                        log.warn { "Table ${table.tableId.table} definition is of unexpected type: ${definition::class.java}" }
-                        throw RuntimeException("Table ${table.tableId.table} definition is of unexpected type: ${definition::class.java}")
-                    }
-                }
-                // log.info { "Table definition after - $tableName" }
-                // log.info { "Table definition after numRows - $tableName" } a
-                // log.info { "Table definition schema - $tableName - schema: $schema" }
-                // List of column metadata
-                val columns = mutableListOf<ColumnMetadata>()
+                // Skip tables that are not standard definitions (like views)
+                if (definition is StandardTableDefinition) {
+                    val tableName = table.tableId.table
 
-                val fieldDefMap = mapDef[datasetName]?.get(tableName)?.fieldDefMap
+                    val tableQuery = mapDef[datasetName]?.get(tableName)?.query?.let { it.replace("+", " ") }
+                        ?: "No query configured"
 
-                // log.info { "I got a fieldDefMap" }
+                    val selectFields = extractFields(tableQuery)
 
-                // Looking up BigQfields against mappings
-                for (field in schema!!.fields) {
-                    // log.info { "Looking up for bq $field - $tableName" }
-                    // Lookup Salesforce field name from mapDef
-                    val salesforceFieldName = fieldDefMap
-                        ?.entries
-                        ?.find { it.value.name == field.name } // Match BigQuery column name with fieldDefMap.name
-                        ?.key?.let { if (selectFields.contains(it)) it else "$it - Missing in query" } ?: "No mapping configured"
+                    val numRows = definition.numRows!!
+                    val schema = definition.schema!!
 
-                    val typeText = fieldDefMap
-                        ?.entries
-                        ?.find { it.value.name == field.name } // Match BigQuery column name with fieldDefMap.name
-                        ?.value?.type?.name?.let { if (it == field.type.name()) it else "$it (configured) / ${field.type.name()} (Big Query) - Mismatch types" } ?: "No mapping configured"
+                    val columns = mutableListOf<ColumnMetadata>()
+                    val fieldDefMap = mapDef[datasetName]?.get(tableName)?.fieldDefMap
 
-                    // log.info { "Looking up $salesforceFieldName for $field for $tableName" }
-                    val columnInfo = ColumnMetadata(
-                        name = field.name,
-                        type = typeText,
-                        mode = field.mode?.name ?: "NULLABLE",
-                        salesforceFieldName = salesforceFieldName // Populate with Salesforce field name
-                    )
-                    columns.add(columnInfo)
-                }
+                    for (field in schema.fields) {
+                        val salesforceFieldName = fieldDefMap
+                            ?.entries
+                            ?.find { it.value.name == field.name } // Match BigQuery column name with fieldDefMap.name
+                            ?.key?.let { if (selectFields.contains(it)) it else "$it - Missing in query" }
+                            ?: "No mapping configured"
 
-                // Looking up SF fields in SELECT that has no mapping - therfor no definition what corresponding BigQ name is
-                selectFields.filter { selectField -> fieldDefMap?.keys?.let { !it.contains(selectField) } ?: false }.forEach {
-                    queryFieldUnmapped ->
-                    val columnInfoQueryFieldNotMapped = ColumnMetadata(
-                        name = "",
-                        type = "",
-                        mode = "",
-                        salesforceFieldName = "$queryFieldUnmapped - No mapping configured" // Populate with Salesforce field name
-                    )
-                    columns.add(columnInfoQueryFieldNotMapped)
-                }
+                        val typeText = fieldDefMap
+                            ?.entries
+                            ?.find { it.value.name == field.name } // Match BigQuery column name with fieldDefMap.name
+                            ?.value?.type?.name?.let { if (it == field.type.name()) it else "$it (configured) / ${field.type.name()} (Big Query) - Mismatch types" }
+                            ?: "No mapping configured"
 
-                selectFields.filter { selectField -> fieldDefMap?.keys?.let { it.contains(selectField) } ?: false } // Has map entry
-                    .filter { selectField ->
-                        fieldDefMap?.entries?.find { it.key == selectField }?.value?.name.let { mappedBigQField ->
-                            schema.fields.let { !(it.any { it.name == mappedBigQField }) } // mapped entry can not be found in big q schema
-                        }
-                    }.forEach {
-                        queryFieldMappedToNonExistingBigQueryField ->
-                        val columnInfoQueryFieldMappedToNonExistingBigQueryField = ColumnMetadata(
-                            name = fieldDefMap?.entries?.find { it.key == queryFieldMappedToNonExistingBigQueryField }?.value?.name!! + " - Not existing",
-                            type = "",
-                            mode = "",
-                            salesforceFieldName = queryFieldMappedToNonExistingBigQueryField // Populate with Salesforce field name
+                        // log.info { "Looking up $salesforceFieldName for $field for $tableName" }
+                        val columnInfo = ColumnMetadata(
+                            name = field.name,
+                            type = typeText,
+                            mode = field.mode?.name ?: "NULLABLE",
+                            salesforceFieldName = salesforceFieldName // Populate with Salesforce field name
                         )
-                        columns.add(columnInfoQueryFieldMappedToNonExistingBigQueryField)
+                        columns.add(columnInfo)
                     }
 
-                // Add table metadata to the list
-                val tableMetadata = TableMetadata(
-                    tableName = tableName,
-                    numRows = numRows,
-                    columns = columns,
-                    salesforceQuery = tableQuery,
-                    active = application.postToBigQuery && !(application.excludeTables.any { it == tableName }),
-                    operationInfo = BulkOperation.operationInfo[datasetName]!![tableName]!!
-                )
-                tablesInfo.add(tableMetadata)
+                    // Looking up SF fields in SELECT that has no mapping - therfor no definition what corresponding BigQ name is
+                    selectFields.filter { selectField -> fieldDefMap?.keys?.let { !it.contains(selectField) } ?: false }
+                        .forEach { queryFieldUnmapped ->
+                            val columnInfoQueryFieldNotMapped = ColumnMetadata(
+                                name = "",
+                                type = "",
+                                mode = "",
+                                salesforceFieldName = "$queryFieldUnmapped - No mapping configured" // Populate with Salesforce field name
+                            )
+                            columns.add(columnInfoQueryFieldNotMapped)
+                        }
+
+                    selectFields.filter { selectField ->
+                        fieldDefMap?.keys?.let { it.contains(selectField) } ?: false
+                    } // Has map entry
+                        .filter { selectField ->
+                            fieldDefMap?.entries?.find { it.key == selectField }?.value?.name.let { mappedBigQField ->
+                                schema.fields.let { !(it.any { it.name == mappedBigQField }) } // mapped entry can not be found in big q schema
+                            }
+                        }.forEach { queryFieldMappedToNonExistingBigQueryField ->
+                            val columnInfoQueryFieldMappedToNonExistingBigQueryField = ColumnMetadata(
+                                name = fieldDefMap?.entries?.find { it.key == queryFieldMappedToNonExistingBigQueryField }?.value?.name!! + " - Not existing",
+                                type = "",
+                                mode = "",
+                                salesforceFieldName = queryFieldMappedToNonExistingBigQueryField // Populate with Salesforce field name
+                            )
+                            columns.add(columnInfoQueryFieldMappedToNonExistingBigQueryField)
+                        }
+
+                    // Add table metadata to the list
+                    val tableMetadata = TableMetadata(
+                        tableName = tableName,
+                        numRows = numRows,
+                        columns = columns,
+                        salesforceQuery = tableQuery,
+                        active = application.postToBigQuery && !(application.excludeTables.any { it == tableName }),
+                        operationInfo = BulkOperation.operationInfo[datasetName]!![tableName]!!
+                    )
+                    tablesInfo.add(tableMetadata)
+                } else {
+                    log.info { "Skipping bigquery $datasetName ${table.tableId.table} that has a definition of type ${definition.type.name()}" }
+                }
             }
 
             // Add dataset metadata to the result map
@@ -263,7 +238,7 @@ object Gui {
         return result
     }
 
-    fun extractFields(query: String): List<String> {
+    private fun extractFields(query: String): List<String> {
         val regex = Regex("SELECT\\s+(.*?)\\s+FROM", RegexOption.IGNORE_CASE)
         val matchResult = regex.find(query)
         return matchResult?.groups?.get(1)?.value
