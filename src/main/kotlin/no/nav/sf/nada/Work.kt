@@ -42,15 +42,18 @@ fun fetchAndSend(localDate: LocalDate?, dataset: String, table: String) {
 
     Metrics.fetchRequest.inc()
     var response = doSFQuery("${AccessTokenHandler.instanceUrl}${application.sfQueryBase}$query")
-    // File("/tmp/latestresponsebody-$table").writeText(response.bodyString())
+
+    if (response.status.code == 400) {
+        Metrics.productsQueryFailed.labels(table).inc()
+        log.error { "${response.status.code}:${response.bodyString()}" }
+        throw IllegalStateException("${response.status.code}:${response.bodyString()}")
+    }
     var obj: JsonObject
     try {
         obj = JsonParser.parseString(response.bodyString()) as JsonObject
         File("/tmp/latestParsedObject").writeText(obj.toString())
     } catch (e: Exception) {
-        val arr: JsonArray = JsonParser.parseString(response.bodyString()) as JsonArray
-        File("/tmp/latestParsedArray").writeText(arr.toString())
-        throw IllegalStateException(e.message)
+        throw IllegalStateException(response.toMessage() + "\n" + e.message)
     }
     val totalSize = obj["totalSize"].asInt
     var done = obj["done"].asBoolean

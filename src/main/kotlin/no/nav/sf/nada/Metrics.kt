@@ -14,13 +14,14 @@ import java.io.StringWriter
 
 object Metrics {
     private val log = KotlinLogging.logger { }
-    val cRegistry: CollectorRegistry = CollectorRegistry.defaultRegistry
 
     val fetchRequest: Counter = registerCounter("fetch_request")
 
     val productsRead: Counter = registerLabelCounter("products_read", "table")
 
     val productsSent: Counter = registerLabelCounter("products_sent", "table")
+
+    val productsQueryFailed: Counter = registerLabelCounter("products_query_failed", "table")
 
     val latestTotalFromTestCall: Gauge = registerLabelGauge("latest_total_from_test", "table")
 
