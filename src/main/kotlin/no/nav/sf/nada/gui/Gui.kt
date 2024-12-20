@@ -10,12 +10,12 @@ import mu.KotlinLogging
 import no.nav.sf.nada.HttpCalls.doSFQuery
 import no.nav.sf.nada.Metrics
 import no.nav.sf.nada.TableDef
-import no.nav.sf.nada.addLimitRestriction
 import no.nav.sf.nada.addYesterdayRestriction
 import no.nav.sf.nada.application
 import no.nav.sf.nada.bulk.BulkOperation
 import no.nav.sf.nada.bulk.OperationInfo
 import no.nav.sf.nada.gson
+import no.nav.sf.nada.removeWhatIdAndWhoId
 import no.nav.sf.nada.token.AccessTokenHandler
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
@@ -52,7 +52,7 @@ object Gui {
         var yesterday = 0
         var total = 0
 
-        val responseTotal = doSFQuery("${AccessTokenHandler.instanceUrl}${application.sfQueryBase}${query.addLimitRestriction()}")
+        val responseTotal = doSFQuery("${AccessTokenHandler.instanceUrl}${application.sfQueryBase}${query.removeWhatIdAndWhoId()}")
         File("/tmp/responseAtTotalCall").writeText(responseTotal.toMessage())
         if (responseTotal.status.code == 400) {
             result += "Bad request: " + responseTotal.bodyString()
@@ -72,9 +72,9 @@ object Gui {
                 File("/tmp/exceptionAtTotalCall").writeText(e.toString() + "\n" + e.stackTraceToString())
             }
         }
-        val responseDate = doSFQuery("${AccessTokenHandler.instanceUrl}${application.sfQueryBase}${queryYesterday.addLimitRestriction()}")
+        val responseDate = doSFQuery("${AccessTokenHandler.instanceUrl}${application.sfQueryBase}${queryYesterday.removeWhatIdAndWhoId()}")
         File("/tmp/responseAtDateCall").writeText(responseDate.toMessage())
-        if (responseTotal.status.code == 400) {
+        if (responseDate.status.code == 400) {
             result += "\nBad request: " + responseDate.bodyString()
             File("/tmp/badRequestAtDateCall").writeText(responseDate.bodyString())
             success = false
