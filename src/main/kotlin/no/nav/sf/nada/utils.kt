@@ -90,20 +90,6 @@ fun String.addLimitRestriction(maxRecords: Int = 1000): String {
     return "$this$connector+$maxRecords"
 }
 
-fun String.removeWhatIdAndWhoId(): String {
-    // Decode the query to manipulate it as a plain text string
-    val decodedQuery = java.net.URLDecoder.decode(this, "UTF-8")
-
-    // Regex to match `WhatId` and `WhoId` fields in the SELECT clause
-    val regex = Regex("\\b(WhatId|WhoId)\\b,?\\s*")
-
-    // Replace matches with an empty string
-    val updatedQuery = decodedQuery.replace(regex, "")
-
-    // Re-encode the query to make it URL-safe again
-    return java.net.URLEncoder.encode(updatedQuery, "UTF-8")
-}
-
 fun String.addNotRecordsFromTodayRestriction(): String {
     val connector = if (this.contains("WHERE")) "+AND" else "+WHERE"
     return this + "$connector+LastModifiedDate<TODAY"
