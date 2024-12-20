@@ -10,7 +10,6 @@ import mu.KotlinLogging
 import no.nav.sf.nada.HttpCalls.doSFQuery
 import no.nav.sf.nada.Metrics
 import no.nav.sf.nada.TableDef
-import no.nav.sf.nada.addLimitRestriction
 import no.nav.sf.nada.addYesterdayRestriction
 import no.nav.sf.nada.application
 import no.nav.sf.nada.bulk.BulkOperation
@@ -52,29 +51,9 @@ object Gui {
         var yesterday = 0
         var total = 0
 
-        val responseTotal = doSFQuery("${AccessTokenHandler.instanceUrl}${application.sfQueryBase}${query.addLimitRestriction()}")
-        File("/tmp/responseAtTotalCall").writeText(responseTotal.toMessage())
-        if (responseTotal.status.code == 400) {
-            result += "Bad request: " + responseTotal.bodyString()
-            File("/tmp/badRequestAtTotalCall").writeText(responseTotal.bodyString())
-            success = false
-        } else {
-            try {
-                val obj = JsonParser.parseString(responseTotal.bodyString()) as JsonObject
-                val totalSize = obj["totalSize"].asInt
-                Metrics.latestTotalFromTestCall.labels(table).set(totalSize.toDouble())
-                result = "Total number of records found is $totalSize"
-                log.info { "Total number of records found is $totalSize" }
-                total = totalSize
-            } catch (e: Exception) {
-                success = false
-                result += e.message
-                File("/tmp/exceptionAtTotalCall").writeText(e.toString() + "\n" + e.stackTraceToString())
-            }
-        }
-        val responseDate = doSFQuery("${AccessTokenHandler.instanceUrl}${application.sfQueryBase}${queryYesterday.addLimitRestriction()}")
+        val responseDate = doSFQuery("${AccessTokenHandler.instanceUrl}${application.sfQueryBase}$queryYesterday")
         File("/tmp/responseAtDateCall").writeText(responseDate.toMessage())
-        if (responseTotal.status.code == 400) {
+        if (responseDate.status.code == 400) {
             result += "\nBad request: " + responseDate.bodyString()
             File("/tmp/badRequestAtDateCall").writeText(responseDate.bodyString())
             success = false
@@ -92,6 +71,31 @@ object Gui {
             }
         }
         File("/tmp/testcallResult").writeText(result)
+
+        if (yesterday > 100) {
+            total = 1000 // Will likely be hitting max - not worth big operation query (TODO could improve fe)
+        } else {
+            val responseTotal = doSFQuery("${AccessTokenHandler.instanceUrl}${application.sfQueryBase}$query")
+            File("/tmp/responseAtTotalCall").writeText(responseTotal.toMessage())
+            if (responseTotal.status.code == 400) {
+                result += "Bad request: " + responseTotal.bodyString()
+                File("/tmp/badRequestAtTotalCall").writeText(responseTotal.bodyString())
+                success = false
+            } else {
+                try {
+                    val obj = JsonParser.parseString(responseTotal.bodyString()) as JsonObject
+                    val totalSize = obj["totalSize"].asInt
+                    Metrics.latestTotalFromTestCall.labels(table).set(totalSize.toDouble())
+                    result = "Total number of records found is $totalSize"
+                    log.info { "Total number of records found is $totalSize" }
+                    total = totalSize
+                } catch (e: Exception) {
+                    success = false
+                    result += e.message
+                    File("/tmp/exceptionAtTotalCall").writeText(e.toString() + "\n" + e.stackTraceToString())
+                }
+            }
+        }
 
         val response = if (success) {
             val pair = Pair(yesterday, total)
