@@ -13,7 +13,7 @@ import org.http4k.routing.ResourceLoader
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.routing.static
-import org.http4k.server.ApacheServer
+import org.http4k.server.Netty
 import org.http4k.server.asServer
 import java.time.LocalDate
 import java.time.LocalTime
@@ -56,7 +56,7 @@ class Application {
         "/internal/storeExpectedCount" bind Method.GET to BulkOperation.storeExpectedCountHandler
     )
 
-    private fun apiServer(port: Int = 8080) = api().asServer(ApacheServer(port))
+    private fun apiServer(port: Int = 8080) = api().asServer(Netty(port))
 
     fun start() {
         BulkOperation.initOperationInfo(mapDef)

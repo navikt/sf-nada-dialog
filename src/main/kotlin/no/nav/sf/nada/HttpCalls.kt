@@ -1,7 +1,7 @@
 package no.nav.sf.nada
 
 import no.nav.sf.nada.token.AccessTokenHandler
-import org.http4k.client.ApacheClient
+import org.http4k.client.OkHttp
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -10,14 +10,14 @@ import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 
 object HttpCalls {
-    private val client = lazy { ApacheClient() }
+    private val client = OkHttp()
 
     fun doSFQuery(query: String): Response {
         val request = Request(Method.GET, "$query")
             .header("Authorization", "Bearer ${AccessTokenHandler.accessToken}")
             .header("Content-Type", "application/json;charset=UTF-8")
         File("/tmp/queryToHappen").writeText(request.toMessage())
-        val response = client.value(request)
+        val response = client(request)
         File("/tmp/responseThatHappend").writeText(response.toMessage())
         // At 400 should to
         return response
@@ -39,7 +39,7 @@ object HttpCalls {
             )
 
         File("/tmp/bulkQueryToHappen").writeText(request.toMessage())
-        val response = client.value(request)
+        val response = client(request)
         File("/tmp/bulkResponseThatHappend").writeText(response.toMessage())
         return response
     }
@@ -49,7 +49,7 @@ object HttpCalls {
             .header("Authorization", "Bearer ${AccessTokenHandler.accessToken}")
             .header("Content-Type", "application/json;charset=UTF-8")
         File("/tmp/bulkJobStatusQueryToHappen").writeText(request.toMessage())
-        val response = client.value(request)
+        val response = client(request)
         File("/tmp/bulkJobStatusResponseThatHappend").writeText(response.toMessage())
         return response
     }
@@ -58,7 +58,7 @@ object HttpCalls {
         val request = Request(Method.GET, "${AccessTokenHandler.instanceUrl}/services/data/v57.0/jobs/query/$jobId/results${locator?.let{"?locator=$locator"} ?: ""}")
             .header("Authorization", "Bearer ${AccessTokenHandler.accessToken}")
 
-        val response = client.value(request)
+        val response = client(request)
         File("/tmp/bulkJobResultResponse${locator?.let{"-$locator"} ?: ""}").writeText(response.toMessage())
         return response
     }

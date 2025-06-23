@@ -14,7 +14,7 @@ import no.nav.sf.nada.secret_SFUsername
 import no.nav.sf.nada.secret_keystoreJKSB64
 import org.apache.commons.codec.binary.Base64.decodeBase64
 import org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString
-import org.http4k.client.ApacheClient
+import org.http4k.client.OkHttp
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -51,7 +51,7 @@ object AccessTokenHandler {
     private val privateKeyAlias = env(secret_PrivateKeyAlias)
     private val privateKeyPassword = env(secret_PrivateKeyPassword)
 
-    private val client: Lazy<HttpHandler> = lazy { ApacheClient() }
+    private val client: HttpHandler = OkHttp()
 
     private val gson = Gson()
 
@@ -95,7 +95,7 @@ object AccessTokenHandler {
 
         for (retry in 1..4) {
             try {
-                val response: Response = client.value(accessTokenRequest)
+                val response: Response = client(accessTokenRequest)
                 if (response.status.code == 200) {
                     File("/tmp/latestAccessTokenResponse").writeText(response.toMessage())
                     val accessTokenResponse = gson.fromJson(response.bodyString(), AccessTokenResponse::class.java)
