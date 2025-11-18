@@ -30,6 +30,7 @@ application {
 dependencies {
     implementation platform('com.google.cloud:libraries-bom:26.71.0')
     implementation 'com.google.cloud:google-cloud-bigquery'
+    implementation 'io.grpc:grpc-netty-shaded:1.75.0'
 
     implementation 'org.apache.commons:commons-csv:1.10.0'
 
