@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:filename")
+
 package no.nav.sf.nada
 
 import com.google.gson.Gson
@@ -25,30 +27,30 @@ val gson = Gson()
  */
 fun conditionalWait(ms: Long) =
     runBlocking {
-
         log.debug { "Will wait $ms ms" }
 
-        val cr = launch {
-            runCatching { delay(ms) }
-                .onSuccess { log.debug { "waiting completed" } }
-                .onFailure { log.info { "waiting interrupted" } }
-        }
-
-        tailrec suspend fun loop(): Unit = when {
-            cr.isCompleted -> Unit
-            ShutdownHook.isActive() -> cr.cancel()
-            else -> {
-                delay(250L)
-                loop()
+        val cr =
+            launch {
+                runCatching { delay(ms) }
+                    .onSuccess { log.debug { "waiting completed" } }
+                    .onFailure { log.info { "waiting interrupted" } }
             }
-        }
+
+        tailrec suspend fun loop(): Unit =
+            when {
+                cr.isCompleted -> Unit
+                ShutdownHook.isActive() -> cr.cancel()
+                else -> {
+                    delay(250L)
+                    loop()
+                }
+            }
 
         loop()
         cr.join()
     }
 
 object ShutdownHook {
-
     private val log = KotlinLogging.logger { }
 
     @Volatile
@@ -57,7 +59,8 @@ object ShutdownHook {
 
     init {
         log.info { "Installing shutdown hook" }
-        Runtime.getRuntime()
+        Runtime
+            .getRuntime()
             .addShutdownHook(
                 object : Thread() {
                     override fun run() {
@@ -65,36 +68,43 @@ object ShutdownHook {
                         log.info { "shutdown hook activated" }
                         mainThread.join()
                     }
-                })
+                },
+            )
     }
 
     fun isActive() = shutdownhookActiveOrOther
-    fun reset() { shutdownhookActiveOrOther = false }
+
+    fun reset() {
+        shutdownhookActiveOrOther = false
+    }
 }
 
 fun String.addDateRestriction(localDate: LocalDate): String {
     val connector = if (this.contains("WHERE")) "+AND" else "+WHERE"
-    return this + "$connector+LastModifiedDate>=TODAY+AND+LastModifiedDate<=TOMORROW"
-        .replace("TODAY", "${localDate.format(DateTimeFormatter.ISO_DATE)}T00:00:00Z".urlEncoded())
-        .replace("TOMORROW", "${localDate.plusDays(1).format(DateTimeFormatter.ISO_DATE)}T00:00:00Z".urlEncoded())
-        .replace(">", ">".urlEncoded())
-        .replace("<", "<".urlEncoded())
+    return this +
+        "$connector+LastModifiedDate>=TODAY+AND+LastModifiedDate<=TOMORROW"
+            .replace("TODAY", "${localDate.format(DateTimeFormatter.ISO_DATE)}T00:00:00Z".urlEncoded())
+            .replace("TOMORROW", "${localDate.plusDays(1).format(DateTimeFormatter.ISO_DATE)}T00:00:00Z".urlEncoded())
+            .replace(">", ">".urlEncoded())
+            .replace("<", "<".urlEncoded())
 }
 
 fun String.addLimitRestriction(maxRecords: Int = 1000): String {
-    val connector = if (this.contains("LIMIT", ignoreCase = true)) {
-        throw IllegalArgumentException("Query already contains a LIMIT clause.")
-    } else {
-        "+LIMIT"
-    }
+    val connector =
+        if (this.contains("LIMIT", ignoreCase = true)) {
+            throw IllegalArgumentException("Query already contains a LIMIT clause.")
+        } else {
+            "+LIMIT"
+        }
     return "$this$connector+$maxRecords"
 }
 
 fun String.addNotRecordsFromTodayRestriction(): String {
     val connector = if (this.contains("WHERE")) "+AND" else "+WHERE"
-    return this + "$connector+LastModifiedDate<TODAY"
-        .replace("TODAY", "${LocalDate.now().format(DateTimeFormatter.ISO_DATE)}T00:00:00Z".urlEncoded())
-        .replace("<", "<".urlEncoded())
+    return this +
+        "$connector+LastModifiedDate<TODAY"
+            .replace("TODAY", "${LocalDate.now().format(DateTimeFormatter.ISO_DATE)}T00:00:00Z".urlEncoded())
+            .replace("<", "<".urlEncoded())
 }
 
 fun String.addYesterdayRestriction(): String = this.addDateRestriction(LocalDate.now().minusDays(1))
@@ -107,10 +117,15 @@ fun parseCSVToJsonArrays(csvData: String): List<JsonArray> {
 
     // Parse the CSV data with the new approach for headers
     val reader = StringReader(csvData)
-    val csvParser = CSVParser(
-        reader,
-        CSVFormat.DEFAULT.builder().setSkipHeaderRecord(true).setHeader().build()
-    )
+    val csvParser =
+        CSVParser(
+            reader,
+            CSVFormat.DEFAULT
+                .builder()
+                .setSkipHeaderRecord(true)
+                .setHeader()
+                .build(),
+        )
 
     // Iterate through the records (skipping the header row)
     for (csvRecord in csvParser) {

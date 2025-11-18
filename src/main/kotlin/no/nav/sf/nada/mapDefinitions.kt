@@ -1,10 +1,19 @@
+@file:Suppress("ktlint:standard:filename")
+
 package no.nav.sf.nada
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 
-data class FieldDef(val name: String, val type: SupportedType)
-data class TableDef(val query: String, val fieldDefMap: MutableMap<String, FieldDef>)
+data class FieldDef(
+    val name: String,
+    val type: SupportedType,
+)
+
+data class TableDef(
+    val query: String,
+    val fieldDefMap: MutableMap<String, FieldDef>,
+)
 
 fun parseMapDef(filePath: String): Map<String, Map<String, TableDef>> =
     parseMapDef(JsonParser.parseString(Application::class.java.getResource(filePath).readText()) as JsonObject)

@@ -13,7 +13,7 @@ import org.http4k.routing.ResourceLoader
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.routing.static
-import org.http4k.server.ApacheServer
+import org.http4k.server.Netty
 import org.http4k.server.asServer
 import java.time.LocalDate
 import java.time.LocalTime
@@ -38,25 +38,28 @@ class Application {
     var hasPostedToday = true // Assume posted today Use oneOff below if you want to post for certain dates at deploy
 
     val bigQueryService: BigQuery =
-        BigQueryOptions.newBuilder()
+        BigQueryOptions
+            .newBuilder()
             .setProjectId(projectId)
-            .build().service
+            .build()
+            .service
 
-    private fun api(): HttpHandler = routes(
-        "/internal/isAlive" bind Method.GET to { Response(Status.OK) },
-        "/internal/isReady" bind Method.GET to { Response(Status.OK) },
-        "/internal/metrics" bind Method.GET to Metrics.metricsHandler,
-        "/internal/gui" bind Method.GET to static(ResourceLoader.Classpath("gui")),
-        "/internal/metadata" bind Method.GET to Gui.metaDataHandler,
-        "/internal/testSalesforceQuery" bind Method.GET to Gui.testCallHandler,
-        "/internal/projectId" bind Method.GET to { Response(Status.OK).body(application.projectId) },
-        "/internal/performBulk" bind Method.GET to BulkOperation.performBulkHandler,
-        "/internal/transfer" bind Method.GET to BulkOperation.transferHandler,
-        "/internal/reset" bind Method.GET to BulkOperation.resetHandler,
-        "/internal/storeExpectedCount" bind Method.GET to BulkOperation.storeExpectedCountHandler
-    )
+    private fun api(): HttpHandler =
+        routes(
+            "/internal/isAlive" bind Method.GET to { Response(Status.OK) },
+            "/internal/isReady" bind Method.GET to { Response(Status.OK) },
+            "/internal/metrics" bind Method.GET to Metrics.metricsHandler,
+            "/internal/gui" bind Method.GET to static(ResourceLoader.Classpath("gui")),
+            "/internal/metadata" bind Method.GET to Gui.metaDataHandler,
+            "/internal/testSalesforceQuery" bind Method.GET to Gui.testCallHandler,
+            "/internal/projectId" bind Method.GET to { Response(Status.OK).body(application.projectId) },
+            "/internal/performBulk" bind Method.GET to BulkOperation.performBulkHandler,
+            "/internal/transfer" bind Method.GET to BulkOperation.transferHandler,
+            "/internal/reset" bind Method.GET to BulkOperation.resetHandler,
+            "/internal/storeExpectedCount" bind Method.GET to BulkOperation.storeExpectedCountHandler,
+        )
 
-    private fun apiServer(port: Int = 8080) = api().asServer(ApacheServer(port))
+    private fun apiServer(port: Int = 8080) = api().asServer(Netty(port))
 
     fun start() {
         BulkOperation.initOperationInfo(mapDef)
@@ -65,8 +68,7 @@ class Application {
         log.info { "1 minutes graceful start - establishing connections" }
         Thread.sleep(60000)
 
-        // One offs (remember to remove after one run):
-        /*
+        /* // One offs (remember to remove after one run):
         oneOff("2024-05-23")
         oneOff("2024-05-30")
         oneOff("2024-06-03")
@@ -74,7 +76,6 @@ class Application {
         oneOff("2024-06-10")
         oneOff("2024-06-13")
          */
-        //
 
         loop()
 
@@ -84,7 +85,6 @@ class Application {
     fun oneOff(localDateAsString: String) = work(LocalDate.parse(localDateAsString))
 
     private tailrec fun loop() {
-
         val stop = ShutdownHook.isActive()
         when {
             stop -> Unit
@@ -100,7 +100,11 @@ class Application {
                     if (LocalTime.now().inActiveRange()) {
                         work()
                     } else {
-                        log.info { "Waiting for active range (later then ${resetRangeStop.format(DateTimeFormatter.ISO_TIME)}) - will sleep 30 minutes." }
+                        log.info {
+                            "Waiting for active range (later then ${resetRangeStop.format(
+                                DateTimeFormatter.ISO_TIME,
+                            )}) - will sleep 30 minutes."
+                        }
                     }
                 }
                 conditionalWait(1800000) // Half an hour
@@ -109,11 +113,7 @@ class Application {
         }
     }
 
-    private fun LocalTime.inResetRange(): Boolean {
-        return this.isAfter(resetRangeStart) && this.isBefore(resetRangeStop)
-    }
+    private fun LocalTime.inResetRange(): Boolean = this.isAfter(resetRangeStart) && this.isBefore(resetRangeStop)
 
-    private fun LocalTime.inActiveRange(): Boolean {
-        return this.isAfter(resetRangeStop)
-    }
+    private fun LocalTime.inActiveRange(): Boolean = this.isAfter(resetRangeStop)
 }

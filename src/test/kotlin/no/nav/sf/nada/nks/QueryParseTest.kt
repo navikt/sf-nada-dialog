@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class QueryParseTest {
-
-    private val exampleMapDefJson = """
+    private val exampleMapDefJson =
+        """
         {
             "dataset": {
                 "table": {
@@ -31,7 +31,7 @@ class QueryParseTest {
                 }
             }
         }
-    """.trimIndent()
+        """.trimIndent()
 
     private val exampleMapDef = parseMapDef(JsonParser.parseString(exampleMapDefJson) as JsonObject)
 
@@ -43,7 +43,7 @@ class QueryParseTest {
         val queryWithDateRestriction = query.addDateRestriction(LocalDate.parse("2000-01-01"))
         Assertions.assertEquals(
             "SELECT+Id+FROM+Event+WHERE+LastModifiedDate%3E=2000-01-01T00%3A00%3A00Z+AND+LastModifiedDate%3C=2000-01-02T00%3A00%3A00Z",
-            queryWithDateRestriction
+            queryWithDateRestriction,
         )
 
         val query2 = exampleMapDef["dataset"]!!["table2"]!!.query
@@ -53,7 +53,7 @@ class QueryParseTest {
 
         Assertions.assertEquals(
             "SELECT+Id+FROM+Event+WHERE+Source='A'+AND+LastModifiedDate%3E=2000-01-01T00%3A00%3A00Z+AND+LastModifiedDate%3C=2000-01-02T00%3A00%3A00Z",
-            queryWithDateRestriction2
+            queryWithDateRestriction2,
         )
     }
 }

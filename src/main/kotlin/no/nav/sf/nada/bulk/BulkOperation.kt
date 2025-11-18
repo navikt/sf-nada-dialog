@@ -118,15 +118,29 @@ object BulkOperation {
                 runTransferJob(dataset, table)
             }
             currentOperationInfo.transferReport = "Transfer of job ${currentOperationInfo.jobId} started for $dataset $table${
-            if (!application.postToBigQuery || application.excludeTables.contains(table)) {
-                " (Will not actually post due to ${if (!application.postToBigQuery) "postToBigQuery flag false" else ""} ${if (application.excludeTables.contains(table)) "table set as excluded" else ""})"
-            } else ""
+                if (!application.postToBigQuery || application.excludeTables.contains(table)) {
+                    " (Will not actually post due to ${if (!application.postToBigQuery) "postToBigQuery flag false" else ""} " +
+                        "${if (application.excludeTables
+                                .contains(
+                                    table,
+                                )
+                        ) {
+                            "table set as excluded"
+                        } else {
+                            ""
+                        }})"
+                } else {
+                    ""
+                }
             }"
             Response(Status.ACCEPTED).body(currentOperationInfo.transferReport)
         }
     }
 
-    fun runTransferJob(dataset: String, table: String) {
+    fun runTransferJob(
+        dataset: String,
+        table: String,
+    ) {
         val currentOperationInfo = operationInfo[dataset]!![table]!!
         log.info { "Starting bulk transfer from batch job ${currentOperationInfo.jobId} to $dataset $table" }
         val fieldDef = application.mapDef[dataset]!![table]!!.fieldDefMap

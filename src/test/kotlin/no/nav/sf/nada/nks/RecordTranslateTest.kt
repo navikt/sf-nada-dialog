@@ -17,6 +17,7 @@ const val RECORD_MOETER_MISSING = "/record_moeter_missing.json"
 public class RecordTranslateTest {
     val mapDefDev = parseMapDef(MAPDEF_FILE_DEV)
     val mapDefProd = parseMapDef(MAPDEF_FILE_PROD)
+
     @Test
     fun test_translation_of_object_missing_element() {
         val recordObj = JsonParser.parseString(RecordTranslateTest::class.java.getResource(RECORD_MOETER_MISSING).readText()) as JsonObject
@@ -26,8 +27,7 @@ public class RecordTranslateTest {
         // println("Expected field $missingFieldNames missing in record, total sum ($missingFieldWarning)")
     }
 
-    // TODO Once we have a stable model to test against, we can do a variant of the testing below to ensure mapdef file is sound etc.
-    /*
+    /*  // TODO Once we have a stable model to test against, we can do a variant of the testing below to ensure mapdef file is sound etc.
     @Test
     fun test_translation_of_agreement_record_with_nulls() {
         val recordObj = JsonParser.parseString(Bootstrap::class.java.getResource(RECORD_AGREEMENT_FILE).readText()) as JsonObject
@@ -51,9 +51,6 @@ public class RecordTranslateTest {
         assertEquals(expected, recordObj.toRowMap(fieldDefMap))
     }
 
-     */
-
-    /*
     @Test
     fun test_translation_of_kunnskapsrecord() {
         val recordObj = JsonParser.parseString(Bootstrap::class.java.getResource(RECORD_KUNNSKAP_FILE).readText()) as JsonObject

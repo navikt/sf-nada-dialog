@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:filename", "ktlint:standard:property-naming")
+
 package no.nav.sf.nada
 
 const val config_MAPDEF_FILE = "MAPDEF_FILE"
@@ -21,6 +23,11 @@ const val secret_PrivateKeyPassword = "PrivateKeyPassword"
 
 fun env(name: String): String = System.getenv(name) ?: throw NullPointerException("Missing env $name")
 
-fun envAsBoolean(env: String): Boolean { return System.getenv(env).trim().toBoolean() }
+fun envAsBoolean(env: String): Boolean = System.getenv(env).trim().toBoolean()
 
-fun envAsList(env: String): List<String> { return System.getenv(env).split(",").map { it.trim() }.toList() }
+fun envAsList(env: String): List<String> =
+    System
+        .getenv(env)
+        .split(",")
+        .map { it.trim() }
+        .toList()

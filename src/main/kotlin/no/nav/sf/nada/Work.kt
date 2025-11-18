@@ -20,7 +20,11 @@ import java.time.LocalDate
 
 private val log = KotlinLogging.logger {}
 
-fun fetchAndSend(localDate: LocalDate?, dataset: String, table: String) {
+fun fetchAndSend(
+    localDate: LocalDate?,
+    dataset: String,
+    table: String,
+) {
     if (localDate == null) {
         log.warn { "No localDate for fetchAndSend specified - will fetch for dataset $dataset table $table without date constraints" }
     } else {
@@ -31,9 +35,10 @@ fun fetchAndSend(localDate: LocalDate?, dataset: String, table: String) {
     } else if (application.mapDef[dataset]?.containsKey(table) == false) {
         throw RuntimeException("mapDef.json is missing a definition for table $table in dataset $dataset")
     }
-    val query = application.mapDef[dataset]!![table]!!.query.let { q ->
-        if (localDate == null) q else q.addDateRestriction(localDate)
-    }
+    val query =
+        application.mapDef[dataset]!![table]!!.query.let { q ->
+            if (localDate == null) q else q.addDateRestriction(localDate)
+        }
     log.info { "Will use query: $query" }
 
     val fieldDef = application.mapDef[dataset]!![table]!!.fieldDefMap
@@ -94,7 +99,11 @@ fun JsonObject.findBottomElement(defKey: String): JsonElement {
     return element
 }
 
-fun remapAndSendRecords(records: JsonArray, tableId: TableId, fieldDefMap: MutableMap<String, FieldDef>) {
+fun remapAndSendRecords(
+    records: JsonArray,
+    tableId: TableId,
+    fieldDefMap: MutableMap<String, FieldDef>,
+) {
     val builder = InsertAllRequest.newBuilder(tableId)
     records.forEach { record ->
         builder.addRow((record as JsonObject).toRowMap(fieldDefMap))
@@ -102,7 +111,9 @@ fun remapAndSendRecords(records: JsonArray, tableId: TableId, fieldDefMap: Mutab
     val insertAllRequest = builder.build()
     records.last().let { File("/tmp/latestRecord_${tableId.table}").writeText("$it") }
     insertAllRequest.rows.last().let { File("/tmp/latestRow_${tableId.table}").writeText("$it") }
-    insertAllRequest.rows.map { "$it" }.joinToString(",\n")
+    insertAllRequest.rows
+        .map { "$it" }
+        .joinToString(",\n")
         .let { File("/tmp/allRows_${tableId.table}").writeText("$it") }
     if (application.postToBigQuery && !(application.excludeTables.any { it == tableId.table })) {
         val response = application.bigQueryService.insertAll(insertAllRequest)
@@ -130,30 +141,36 @@ fun JsonObject.toRowMap(fieldDefMap: MutableMap<String, FieldDef>): MutableMap<S
         // log.info { "${elementValueOrNull.asString} -> ${defEntry.value.name} (${defEntry.value.type})\n" }
         File("/tmp/translateProcess").appendText("${elementValueOrNull.asString} -> ${defEntry.value.name} (${defEntry.value.type})\n")
         // }
-        rowMap[defEntry.value.name] = if (element is JsonNull) {
-            null
-        } else {
-            when (defEntry.value.type) {
-                SupportedType.STRING -> element.asString
-                SupportedType.INTEGER -> element.asInt
-                SupportedType.DATETIME -> element.asString.subSequence(0, 23)
-                SupportedType.DATE -> element.asString
-                SupportedType.BOOL -> element.asBoolean
+        rowMap[defEntry.value.name] =
+            if (element is JsonNull) {
+                null
+            } else {
+                when (defEntry.value.type) {
+                    SupportedType.STRING -> element.asString
+                    SupportedType.INTEGER -> element.asInt
+                    SupportedType.DATETIME -> element.asString.subSequence(0, 23)
+                    SupportedType.DATE -> element.asString
+                    SupportedType.BOOL -> element.asBoolean
+                }
             }
-        }
     }
     return rowMap
 }
 
 internal fun work(targetDate: LocalDate = LocalDate.now().minusDays(1)) {
     BulkOperation.initOperationInfo(application.mapDef) // Clear operation state for bulk jobs via gui
-    log.info { "Work session starting to fetch for $targetDate excluding ${application.excludeTables} - post to BQ: ${application.postToBigQuery}" }
+    log.info {
+        "Work session starting to fetch for $targetDate excluding ${application.excludeTables} - post to BQ: ${application.postToBigQuery}"
+    }
     try {
         application.mapDef.keys.forEach { dataset ->
-            application.mapDef[dataset]!!.keys.filter {
-                !(application.excludeTables.contains(it)).also { excluding -> if (excluding) log.info { "Will skip excluded table $it" } }
-            }
-                .forEach { table ->
+            application.mapDef[dataset]!!
+                .keys
+                .filter {
+                    !(application.excludeTables.contains(it)).also { excluding ->
+                        if (excluding) log.info { "Will skip excluded table $it" }
+                    }
+                }.forEach { table ->
                     log.info { "Will attempt fetch and send for dataset $dataset, table $table, date $targetDate" }
                     fetchAndSend(targetDate, dataset, table)
                     application.hasPostedToday = true
