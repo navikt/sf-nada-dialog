@@ -50,6 +50,9 @@ dependencies {
 
     implementation "com.google.oauth-client:google-oauth-client:1.33.3"
 
+    //Transient dep, not really in use:
+    implementation "com.google.protobuf:protobuf-java:3.25.5"
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
