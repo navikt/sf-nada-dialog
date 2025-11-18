@@ -32,8 +32,8 @@ fun conditionalWait(ms: Long) =
         val cr =
             launch {
                 runCatching { delay(ms) }
-                    .onSuccess { log.debug { "waiting completed" } }
-                    .onFailure { log.info { "waiting interrupted" } }
+                    .onSuccess { log.debug { "Waiting completed" } }
+                    .onFailure { log.info { "Waiting interrupted" } }
             }
 
         tailrec suspend fun loop(): Unit =
